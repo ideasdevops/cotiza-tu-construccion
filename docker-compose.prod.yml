@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  python:
+    image: python:3.11-slim
+    working_dir: /app/backend-python
+    command: bash -lc "pip install --no-cache-dir -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"
+    volumes:
+      - ./backend-python:/app/backend-python
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app/backend-python
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  node:
+    image: node:20-alpine
+    working_dir: /app/backend-node
+    command: bash -lc "npm ci --only=production && npm run build && npm start"
+    volumes:
+      - ./backend-node:/app/backend-node
+      - ./frontend:/app/frontend
+    environment:
+      - PY_SERVICE_URL=http://python:8000
+      - PORT=8005
+      - NODE_ENV=production
+    ports:
+      - "8005:8005"
+    depends_on:
+      python:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,83 @@
+name: cotizador-construccion
+description: Cotizador online profesional para construcción de módulos de viviendas y estructuras industriales
+
+services:
+  - name: python-backend
+    type: docker
+    source:
+      type: image
+      image: python:3.11-slim
+    workingDir: /app/backend-python
+    command: >
+      bash -lc "
+      pip install --no-cache-dir -r requirements.txt &&
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+      "
+    volumes:
+      - ./backend-python:/app/backend-python
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app/backend-python
+      - PYTHONUNBUFFERED=1
+    restartPolicy: unless-stopped
+    healthCheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      startPeriod: 40s
+
+  - name: node-backend
+    type: docker
+    source:
+      type: image
+      image: node:20-alpine
+    workingDir: /app/backend-node
+    command: >
+      bash -lc "
+      npm ci --only=production &&
+      npm run build &&
+      npm start
+      "
+    volumes:
+      - ./backend-node:/app/backend-node
+      - ./frontend:/app/frontend
+    environment:
+      - PY_SERVICE_URL=http://python-backend:8000
+      - PORT=8005
+      - NODE_ENV=production
+    ports:
+      - "8005:8005"
+    dependsOn:
+      - python-backend
+    restartPolicy: unless-stopped
+    healthCheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      startPeriod: 40s
+
+  - name: nginx
+    type: docker
+    source:
+      type: image
+      image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    dependsOn:
+      - node-backend
+    restartPolicy: unless-stopped
+
+networks:
+  - name: default
+    driver: bridge
+
+volumes:
+  - name: app-data
+    driver: local
