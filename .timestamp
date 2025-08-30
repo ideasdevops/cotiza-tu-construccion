@@ -1,0 +1,7 @@
+# Timestamp de última actualización
+# Forzar actualización en Easypanel
+# Última modificación: 2025-08-30 15:10:00 GMT
+# Cambios aplicados:
+# - Pydantic v2 compatibility (regex -> pattern)
+# - Docker Compose version removed
+# - Python backend fixed
