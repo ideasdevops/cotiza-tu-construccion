@@ -1,30 +1,24 @@
-# Dockerfile para Cotizador de Construcción
-FROM node:20-alpine
+# Dockerfile Ultra-Simple para Cotizador de Construcción
+FROM python:3.11-slim
 
 # Instalar dependencias del sistema
-RUN apk add --no-cache python3 py3-pip
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de configuración
-COPY backend-node/package*.json ./backend-node/
-COPY backend-python/requirements.txt ./backend-python/
-
-# Instalar dependencias de Node.js
-WORKDIR /app/backend-node
-RUN npm ci --only=production
-
-# Instalar dependencias de Python
-WORKDIR /app/backend-python
-RUN pip3 install --no-cache-dir -r requirements.txt
-
 # Copiar código fuente
-WORKDIR /app
 COPY . .
 
-# Exponer puerto
-EXPOSE 8005
+# Instalar dependencias de Python
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r backend-python/requirements.txt
 
-# Comando por defecto
-CMD ["npm", "run", "start", "--prefix", "backend-node"]
+# Exponer puerto
+EXPOSE 8000
+
+# Comando de inicio simple
+CMD ["python", "-m", "uvicorn", "backend-python.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
