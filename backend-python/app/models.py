@@ -27,7 +27,7 @@ class Material(BaseModel):
 class CotizacionRequest(BaseModel):
     # Datos del cliente
     nombre: str = Field(..., min_length=2, max_length=100)
-    email: str = Field(..., regex=r"^[^@]+@[^@]+\.[^@]+$")
+    email: str = Field(..., pattern=r"^[^@]+@[^@]+\.[^@]+$")
     telefono: Optional[str] = None
     
     # Tipo de construcción
