@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cotizador de Construcción - Steel Frame & Industrial</title>
+  <meta name="description" content="Cotizador online profesional para construcción steel frame, industrial y contenedores marítimos en Argentina" />
+  <meta name="keywords" content="cotizador, construcción, steel frame, industrial, contenedores, argentina" />
+  
+  <!-- Estilos -->
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+  
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-building fa-2x"></i>
+          <h1>Cotizador de Construcción</h1>
+        </div>
+        <p class="header-subtitle">Steel Frame • Industrial • Contenedores • Materiales en Seco</p>
+        <div class="header-actions">
+          <a class="cta-btn primary" href="#cotizador">Cotizar Ahora</a>
+          <a class="cta-btn secondary" href="#materiales">Ver Materiales</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navegación -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-content">
+        <div class="nav-logo">
+          <i class="fas fa-building"></i>
+          <span>Cotizador</span>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#tipos">Tipos</a></li>
+          <li><a href="#cotizador">Cotizar</a></li>
+          <li><a href="#materiales">Materiales</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+        <div class="nav-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sección Principal -->
+  <main>
+    <!-- Hero Section -->
+    <section id="inicio" class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h2>Construcción Moderna y Eficiente</h2>
+            <p>Cotiza tu proyecto de construcción steel frame, industrial o con contenedores marítimos. Precios actualizados del mercado argentino con APIs en tiempo real.</p>
+            <div class="hero-features">
+              <div class="feature">
+                <i class="fas fa-bolt"></i>
+                <span>Rápida construcción</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-leaf"></i>
+                <span>Materiales ecológicos</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-dollar-sign"></i>
+                <span>Precios competitivos</span>
+              </div>
+            </div>
+            <a href="#cotizador" class="cta-btn primary large">Comenzar Cotización</a>
+          </div>
+          <div class="hero-visual">
+            <div class="construction-preview">
+              <div class="preview-item active" data-type="steel-frame">
+                <i class="fas fa-home"></i>
+                <h3>Steel Frame</h3>
+                <p>Construcción en seco con perfiles de acero</p>
+              </div>
+              <div class="preview-item" data-type="industrial">
+                <i class="fas fa-industry"></i>
+                <h3>Industrial</h3>
+                <p>Estructuras con hierros estructurales</p>
+              </div>
+              <div class="preview-item" data-type="contenedor">
+                <i class="fas fa-shipping-container"></i>
+                <h3>Contenedores</h3>
+                <p>Módulos con contenedores marítimos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tipos de Construcción -->
+    <section id="tipos" class="construction-types">
+      <div class="container">
+        <div class="section-header">
+          <h2>Tipos de Construcción</h2>
+          <p>Elige el sistema constructivo que mejor se adapte a tu proyecto</p>
+        </div>
+        <div class="types-grid">
+          <div class="type-card" data-type="steel_frame">
+            <div class="type-icon">
+              <i class="fas fa-home"></i>
+            </div>
+            <h3>Steel Frame</h3>
+            <p>Construcción en seco con perfiles de acero galvanizado. Ideal para viviendas residenciales con excelente aislamiento térmico y acústico.</p>
+            <ul class="type-features">
+              <li><i class="fas fa-check"></i> Construcción rápida</li>
+              <li><i class="fas fa-check"></i> Excelente aislamiento</li>
+              <li><i class="fas fa-check"></i> Materiales ecológicos</li>
+              <li><i class="fas fa-check"></i> Alta durabilidad</li>
+            </ul>
+            <div class="type-price">
+              <span class="price-label">Desde</span>
+              <span class="price-value">$2,500</span>
+              <span class="price-unit">/m²</span>
+            </div>
+          </div>
+
+          <div class="type-card" data-type="industrial">
+            <div class="type-icon">
+              <i class="fas fa-industry"></i>
+            </div>
+            <h3>Industrial</h3>
+            <p>Estructuras robustas con hierros estructurales y metales. Perfecto para naves industriales, galpones y espacios de trabajo.</p>
+            <ul class="type-features">
+              <li><i class="fas fa-check"></i> Alta resistencia</li>
+              <li><i class="fas fa-check"></i> Ideal para industria</li>
+              <li><i class="fas fa-check"></i> Económico</li>
+              <li><i class="fas fa-check"></i> Construcción rápida</li>
+            </ul>
+            <div class="type-price">
+              <span class="price-label">Desde</span>
+              <span class="price-value">$2,200</span>
+              <span class="price-unit">/m²</span>
+            </div>
+          </div>
+
+          <div class="type-card" data-type="contenedor">
+            <div class="type-icon">
+              <i class="fas fa-shipping-container"></i>
+            </div>
+            <h3>Contenedor Marítimo</h3>
+            <p>Conversión de contenedores marítimos en módulos habitables. Solución económica y portátil para diversos usos.</p>
+            <ul class="type-features">
+              <li><i class="fas fa-check"></i> Muy económico</li>
+              <li><i class="fas fa-check"></i> Portátil</li>
+              <li><i class="fas fa-check"></i> Construcción rápida</li>
+              <li><i class="fas fa-check"></i> Reutilizable</li>
+            </ul>
+            <div class="type-price">
+              <span class="price-label">Desde</span>
+              <span class="price-value">$1,800</span>
+              <span class="price-unit">/m²</span>
+            </div>
+          </div>
+
+          <div class="type-card" data-type="mixto">
+            <div class="type-icon">
+              <i class="fas fa-puzzle-piece"></i>
+            </div>
+            <h3>Sistema Mixto</h3>
+            <p>Combinación inteligente de diferentes sistemas constructivos para maximizar eficiencia y personalización.</p>
+            <ul class="type-features">
+              <li><i class="fas fa-check"></i> Máxima flexibilidad</li>
+              <li><i class="fas fa-check"></i> Personalizable</li>
+              <li><i class="fas fa-check"></i> Adaptable</li>
+              <li><i class="fas fa-check"></i> Optimizado</li>
+            </ul>
+            <div class="type-price">
+              <span class="price-label">Desde</span>
+              <span class="price-value">$2,300</span>
+              <span class="price-unit">/m²</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cotizador -->
+    <section id="cotizador" class="quote-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Cotizador Online</h2>
+          <p>Calcula el costo de tu proyecto en segundos con precios actualizados del mercado argentino</p>
+        </div>
+        
+        <div class="quote-container">
+          <div class="quote-form">
+            <form id="quoteForm">
+              <!-- Datos del Cliente -->
+              <div class="form-section">
+                <h3><i class="fas fa-user"></i> Datos del Cliente</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="nombre">Nombre completo *</label>
+                    <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre completo">
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required placeholder="tu@email.com">
+                  </div>
+                  <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" placeholder="+54 11 1234-5678">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tipo de Construcción -->
+              <div class="form-section">
+                <h3><i class="fas fa-building"></i> Tipo de Construcción</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="tipo_construccion">Sistema constructivo *</label>
+                    <select id="tipo_construccion" name="tipo_construccion" required>
+                      <option value="">Selecciona un tipo</option>
+                      <option value="steel_frame">Steel Frame</option>
+                      <option value="industrial">Industrial</option>
+                      <option value="contenedor">Contenedor Marítimo</option>
+                      <option value="mixto">Sistema Mixto</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="tipo_uso">Tipo de uso *</label>
+                    <select id="tipo_uso" name="tipo_uso" required>
+                      <option value="">Selecciona el uso</option>
+                      <option value="residencial">Residencial</option>
+                      <option value="industrial">Industrial</option>
+                      <option value="comercial">Comercial</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="nivel_terminacion">Nivel de terminación *</label>
+                    <select id="nivel_terminacion" name="nivel_terminacion" required>
+                      <option value="">Selecciona el nivel</option>
+                      <option value="basico">Básico</option>
+                      <option value="estandar">Estándar</option>
+                      <option value="premium">Premium</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dimensiones -->
+              <div class="form-section">
+                <h3><i class="fas fa-ruler-combined"></i> Dimensiones</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="metros_cuadrados">Metros cuadrados *</label>
+                    <input type="number" id="metros_cuadrados" name="metros_cuadrados" min="1" max="10000" required placeholder="100">
+                    <small>Mínimo: 1m², Máximo: 10,000m²</small>
+                  </div>
+                  <div class="form-group">
+                    <label for="pisos">Número de pisos</label>
+                    <input type="number" id="pisos" name="pisos" min="1" max="10" value="1" placeholder="1">
+                    <small>Mínimo: 1, Máximo: 10</small>
+                  </div>
+                  <div class="form-group">
+                    <label for="ancho">Ancho (metros)</label>
+                    <input type="number" id="ancho" name="ancho" min="1" step="0.1" placeholder="10">
+                  </div>
+                  <div class="form-group">
+                    <label for="largo">Largo (metros)</label>
+                    <input type="number" id="largo" name="largo" min="1" step="0.1" placeholder="10">
+                  </div>
+                </div>
+                
+                <div class="form-checkboxes">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="tiene_terraza" name="tiene_terraza">
+                    <span class="checkmark"></span>
+                    Incluir terraza
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="tiene_sotano" name="tiene_sotano">
+                    <span class="checkmark"></span>
+                    Incluir sótano
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="incluye_instalaciones" name="incluye_instalaciones" checked>
+                    <span class="checkmark"></span>
+                    Incluir instalaciones
+                  </label>
+                </div>
+              </div>
+
+              <!-- Ubicación -->
+              <div class="form-section">
+                <h3><i class="fas fa-map-marker-alt"></i> Ubicación</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="provincia">Provincia *</label>
+                    <select id="provincia" name="provincia" required>
+                      <option value="">Selecciona una provincia</option>
+                      <option value="buenos_aires">Buenos Aires</option>
+                      <option value="caba">Ciudad Autónoma de Buenos Aires</option>
+                      <option value="cordoba">Córdoba</option>
+                      <option value="santa_fe">Santa Fe</option>
+                      <option value="mendoza">Mendoza</option>
+                      <option value="tucuman">Tucumán</option>
+                      <option value="salta">Salta</option>
+                      <option value="jujuy">Jujuy</option>
+                      <option value="chaco">Chaco</option>
+                      <option value="formosa">Formosa</option>
+                      <option value="misiones">Misiones</option>
+                      <option value="corrientes">Corrientes</option>
+                      <option value="entre_rios">Entre Ríos</option>
+                      <option value="la_pampa">La Pampa</option>
+                      <option value="rio_negro">Río Negro</option>
+                      <option value="neuquen">Neuquén</option>
+                      <option value="chubut">Chubut</option>
+                      <option value="santa_cruz">Santa Cruz</option>
+                      <option value="tierra_del_fuego">Tierra del Fuego</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="ciudad">Ciudad *</label>
+                    <input type="text" id="ciudad" name="ciudad" required placeholder="Nombre de la ciudad">
+                  </div>
+                  <div class="form-group">
+                    <label for="zona">Zona/Barrio</label>
+                    <input type="text" id="zona" name="zona" placeholder="Zona o barrio específico">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones de Acción -->
+              <div class="form-actions">
+                <button type="button" id="btnPreview" class="btn secondary">
+                  <i class="fas fa-eye"></i> Vista Previa
+                </button>
+                <button type="submit" id="btnCalculate" class="btn primary">
+                  <i class="fas fa-calculator"></i> Calcular Cotización
+                </button>
+                <button type="button" id="btnReset" class="btn outline">
+                  <i class="fas fa-undo"></i> Reiniciar
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Panel de Resultados -->
+          <div class="quote-results" id="quoteResults" style="display: none;">
+            <div class="results-header">
+              <h3><i class="fas fa-chart-pie"></i> Resultado de la Cotización</h3>
+              <div class="quote-id">ID: <span id="quoteId">-</span></div>
+            </div>
+            
+            <div class="results-content">
+              <div class="total-section">
+                <div class="total-amount">
+                  <span class="total-label">Total Estimado</span>
+                  <span class="total-value" id="totalAmount">$0</span>
+                  <span class="total-currency">ARS</span>
+                </div>
+                <div class="total-details">
+                  <span class="validity">Válido por 30 días</span>
+                  <span class="timestamp" id="quoteTimestamp">-</span>
+                </div>
+              </div>
+
+              <div class="breakdown-section">
+                <h4>Desglose de Costos</h4>
+                <div class="breakdown-grid">
+                  <div class="breakdown-item">
+                    <span class="item-label">Materiales</span>
+                    <span class="item-value" id="materialesCost">$0</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="item-label">Mano de Obra</span>
+                    <span class="item-value" id="manoObraCost">$0</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="item-label">Terminaciones</span>
+                    <span class="item-value" id="terminacionesCost">$0</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="item-label">Instalaciones</span>
+                    <span class="item-value" id="instalacionesCost">$0</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="item-label">Transporte</span>
+                    <span class="item-value" id="transporteCost">$0</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="item-label">Impuestos (21%)</span>
+                    <span class="item-value" id="impuestosCost">$0</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="materials-section">
+                <h4>Materiales Utilizados</h4>
+                <div class="materials-list" id="materialsList">
+                  <!-- Los materiales se cargarán dinámicamente -->
+                </div>
+              </div>
+
+              <div class="timeline-section">
+                <h4>Tiempo Estimado de Construcción</h4>
+                <div class="timeline-value" id="constructionTime">-</div>
+              </div>
+
+              <div class="observations-section">
+                <h4>Observaciones</h4>
+                <ul class="observations-list" id="observationsList">
+                  <!-- Las observaciones se cargarán dinámicamente -->
+                </ul>
+              </div>
+
+              <div class="results-actions">
+                <button type="button" id="btnDownloadPDF" class="btn primary">
+                  <i class="fas fa-download"></i> Descargar PDF
+                </button>
+                <button type="button" id="btnShareQuote" class="btn secondary">
+                  <i class="fas fa-share"></i> Compartir
+                </button>
+                <button type="button" id="btnNewQuote" class="btn outline">
+                  <i class="fas fa-plus"></i> Nueva Cotización
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Materiales -->
+    <section id="materiales" class="materials-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Materiales y Precios</h2>
+          <p>Precios actualizados de materiales de construcción en Argentina</p>
+        </div>
+        
+        <div class="materials-container">
+          <div class="materials-filters">
+            <button class="filter-btn active" data-category="todos">Todos</button>
+            <button class="filter-btn" data-category="estructura">Estructura</button>
+            <button class="filter-btn" data-category="cubierta">Cubierta</button>
+            <button class="filter-btn" data-category="aislamiento">Aislamiento</button>
+            <button class="filter-btn" data-category="interior">Interior</button>
+            <button class="filter-btn" data-category="terminacion">Terminación</button>
+          </div>
+          
+          <div class="materials-grid" id="materialsGrid">
+            <!-- Los materiales se cargarán dinámicamente -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contacto -->
+    <section id="contacto" class="contact-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Contacto</h2>
+          <p>¿Tienes preguntas sobre tu cotización? Contáctanos</p>
+        </div>
+        
+        <div class="contact-container">
+          <div class="contact-info">
+            <div class="contact-item">
+              <i class="fas fa-envelope"></i>
+              <div>
+                <h4>Email</h4>
+                <p>info@cotizadorconstruccion.com</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-phone"></i>
+              <div>
+                <h4>Teléfono</h4>
+                <p>+54 11 1234-5678</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <div>
+                <h4>Ubicación</h4>
+                <p>Buenos Aires, Argentina</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="contact-form">
+            <form id="contactForm">
+              <div class="form-group">
+                <label for="contactName">Nombre</label>
+                <input type="text" id="contactName" name="name" required>
+              </div>
+              <div class="form-group">
+                <label for="contactEmail">Email</label>
+                <input type="email" id="contactEmail" name="email" required>
+              </div>
+              <div class="form-group">
+                <label for="contactMessage">Mensaje</label>
+                <textarea id="contactMessage" name="message" rows="5" required></textarea>
+              </div>
+              <button type="submit" class="btn primary">Enviar Mensaje</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Cotizador de Construcción</h3>
+          <p>Herramienta profesional para cotizar proyectos de construcción steel frame, industrial y contenedores marítimos en Argentina.</p>
+        </div>
+        <div class="footer-section">
+          <h4>Enlaces Rápidos</h4>
+          <ul>
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#tipos">Tipos</a></li>
+            <li><a href="#cotizador">Cotizar</a></li>
+            <li><a href="#materiales">Materiales</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Contacto</h4>
+          <ul>
+            <li><i class="fas fa-envelope"></i> info@cotizadorconstruccion.com</li>
+            <li><i class="fas fa-phone"></i> +54 11 1234-5678</li>
+            <li><i class="fas fa-map-marker-alt"></i> Buenos Aires, Argentina</li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Síguenos</h4>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Cotizador de Construcción. Todos los derechos reservados.</p>
+        <p>Desarrollado con <i class="fas fa-heart"></i> en Argentina</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/js/app.js"></script>
+  <script src="/js/quote.js"></script>
+  <script src="/js/materials.js"></script>
+  <script src="/js/ui.js"></script>
+</body>
+</html>
