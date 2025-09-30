@@ -29,6 +29,7 @@ class CotizacionRequest(BaseModel):
     nombre: str = Field(..., min_length=2, max_length=100)
     email: str = Field(..., pattern=r"^[^@]+@[^@]+\.[^@]+$")
     telefono: Optional[str] = None
+    whatsapp: Optional[str] = None
     
     # Tipo de construcción
     tipo_construccion: TipoConstruccion
@@ -54,12 +55,13 @@ class CotizacionRequest(BaseModel):
     provincia: str
     ciudad: str
     zona: Optional[str] = None
+    observaciones: Optional[str] = None
 
 class CotizacionResponse(BaseModel):
     id: str
     cliente: str
     total_estimado: float
-    moneda: str = "ARS"
+    moneda: str = "USD"
     desglose: dict
     materiales_utilizados: List[Material]
     tiempo_estimado: str

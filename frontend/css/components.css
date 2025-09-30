@@ -7,11 +7,20 @@
 }
 
 .quote-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-2xl);
-  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
   margin: 0 auto;
+  gap: var(--spacing-2xl);
+}
+
+.quote-form {
+  width: 100%;
+  background: var(--white);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
 }
 
 .quote-form {
@@ -157,6 +166,7 @@
   border: 1px solid var(--gray-200);
   max-height: 80vh;
   overflow-y: auto;
+  width: 100%;
 }
 
 .results-header {
@@ -736,4 +746,268 @@
 
 .notification.info {
   background: var(--info);
+}
+
+/* ===== SECCIÓN DE MATERIALES ===== */
+.materials-selection {
+  background: var(--gray-50);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--gray-200);
+}
+
+.materials-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.materials-header p {
+  color: var(--gray-600);
+  margin: 0;
+}
+
+.materials-list {
+  min-height: 120px;
+  margin-bottom: var(--spacing-lg);
+}
+
+.no-materials-message {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--gray-500);
+}
+
+.no-materials-message i {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+  color: var(--gray-400);
+}
+
+.materials-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--white);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--gray-200);
+  font-weight: 600;
+}
+
+.total-label {
+  color: var(--gray-700);
+}
+
+.total-value {
+  color: var(--primary-color);
+  font-size: 1.125rem;
+}
+
+.materials-error {
+  background: var(--error);
+  color: var(--white);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin-top: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.materials-error i {
+  font-size: 1.125rem;
+}
+
+/* ===== RESPONSIVE PARA MATERIALES ===== */
+@media (max-width: 768px) {
+  .materials-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+  
+  .materials-total {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+}
+
+/* Estilos para logos de Sumpetrol */
+.sumpetrol-logo {
+  height: 60px;
+  width: auto;
+  margin-right: 16px;
+  filter: brightness(0) invert(1); /* Hacer logo blanco para el header */
+}
+
+.nav-sumpetrol-logo {
+  height: 40px;
+  width: auto;
+  margin-right: 12px;
+  filter: brightness(0) invert(1); /* Hacer logo blanco para la navegación */
+}
+
+/* Responsive para logos */
+@media (max-width: 768px) {
+  .sumpetrol-logo {
+    height: 50px;
+    margin-right: 12px;
+  }
+  
+  .nav-sumpetrol-logo {
+    height: 35px;
+    margin-right: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sumpetrol-logo {
+    height: 45px;
+    margin-right: 8px;
+  }
+  
+  .nav-sumpetrol-logo {
+    height: 30px;
+    margin-right: 6px;
+  }
+}
+
+/* ===== SISTEMA ANTI-BOT ===== */
+.anti-bot-section {
+  background: var(--gray-50);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+}
+
+.anti-bot-section h3 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.anti-bot-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.captcha-challenge {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  background: var(--white);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--gray-200);
+}
+
+.captcha-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-weight: 500;
+  color: var(--gray-700);
+}
+
+.captcha-question {
+  font-size: 1.125rem;
+  color: var(--gray-800);
+}
+
+.captcha-hint {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+.captcha-input {
+  max-width: 200px;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  border: 2px solid var(--gray-300);
+  transition: all var(--transition-fast);
+}
+
+.captcha-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.captcha-error {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--error);
+  color: var(--white);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-size: 0.875rem;
+  margin-top: var(--spacing-sm);
+}
+
+.captcha-error i {
+  color: var(--white);
+}
+
+.honeypot-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.time-validation {
+  display: none;
+}
+
+/* Estilos para precios actualizados */
+.price-update {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-top: var(--spacing-xs);
+  font-style: italic;
+}
+
+/* Estilos para enlaces de contacto */
+.contact-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  border-bottom: 1px solid transparent;
+}
+
+.contact-link:hover {
+  color: var(--primary-dark);
+  border-bottom-color: var(--primary-color);
+}
+
+.whatsapp-link {
+  color: #25D366;
+}
+
+.whatsapp-link:hover {
+  color: #128C7E;
+}
+
+/* Responsive para anti-bot */
+@media (max-width: 768px) {
+  .anti-bot-section {
+    padding: var(--spacing-lg);
+  }
+  
+  .captcha-challenge {
+    padding: var(--spacing-md);
+  }
+  
+  .captcha-input {
+    max-width: 150px;
+    font-size: 1.125rem;
+  }
 }

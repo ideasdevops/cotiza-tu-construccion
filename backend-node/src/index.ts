@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
 import axios from 'axios';
+import emailRoutes from '../routes/email';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -42,6 +43,9 @@ app.use((req, res, next) => {
 
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../../frontend')));
+
+// Rutas de email
+app.use('/api/email', emailRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

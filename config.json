@@ -1,0 +1,7 @@
+{
+    "app_name": "cotizador-construccion",
+    "version": "1.0.0",
+    "description": "Cotizador online profesional para construcción Steel Frame & Industrial - Sumpetrol",
+    "company": "Sumpetrol Argentina",
+    "deploy_system": "deploy-system-for-easypanel"
+}

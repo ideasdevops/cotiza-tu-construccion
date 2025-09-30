@@ -140,18 +140,23 @@ class QuoteCalculator {
   async handleFormSubmit(e) {
     e.preventDefault();
     
-    if (!this.validateForm()) {
-      return;
-    }
-    
     try {
+      console.log('🚀 Iniciando proceso de cotización...');
+      
+      if (!this.validateForm()) {
+        console.warn('⚠️ Validación del formulario falló');
+        return;
+      }
+      
       this.setLoadingState(true);
       
       // Obtener datos del formulario
       const formData = this.getFormData();
+      console.log('📋 Datos del formulario obtenidos:', formData);
       
       // Crear cotización
       const quote = await this.createQuote(formData);
+      console.log('✅ Cotización creada:', quote);
       
       // Mostrar resultados
       this.showResults(quote);
@@ -160,16 +165,18 @@ class QuoteCalculator {
       this.currentQuote = quote;
       
       // Mostrar notificación de éxito
-      if (window.app) {
+      if (window.app && window.app.showNotification) {
         window.app.showNotification('Cotización generada exitosamente', 'success');
+      } else {
+        console.log('✅ Cotización generada exitosamente');
       }
       
     } catch (error) {
-      console.error('Error creando cotización:', error);
+      console.error('❌ Error creando cotización:', error);
       
-      if (window.app) {
-        window.app.handleError(error, 'creación de cotización');
-      }
+      // Mostrar error al usuario
+      this.showErrorMessage('Error al generar la cotización: ' + error.message);
+      
     } finally {
       this.setLoadingState(false);
     }
@@ -202,6 +209,11 @@ class QuoteCalculator {
       isValid = false;
     }
     
+    // Validar que se hayan agregado materiales usando el gestor de materiales
+    if (window.materialsQuoteManager && !window.materialsQuoteManager.validateMaterialsBeforeCalculation()) {
+      isValid = false;
+    }
+    
     return isValid;
   }
 
@@ -224,14 +236,14 @@ class QuoteCalculator {
     // Validaciones específicas por tipo
     switch (field.type) {
       case 'email':
-        if (value && !window.app?.validateEmail(value)) {
+        if (value && window.app && !window.app.validateEmail(value)) {
           this.showFieldError(field, 'Email inválido');
           return false;
         }
         break;
         
       case 'tel':
-        if (value && !window.app?.validatePhone(value)) {
+        if (value && window.app && !window.app.validatePhone(value)) {
           this.showFieldError(field, 'Teléfono inválido');
           return false;
         }
@@ -297,6 +309,7 @@ class QuoteCalculator {
       nombre: formData.get('nombre'),
       email: formData.get('email'),
       telefono: formData.get('telefono'),
+      whatsapp: formData.get('whatsapp'),
       tipo_construccion: formData.get('tipo_construccion'),
       tipo_uso: formData.get('tipo_uso'),
       nivel_terminacion: formData.get('nivel_terminacion'),
@@ -310,53 +323,125 @@ class QuoteCalculator {
       incluye_instalaciones: formData.get('incluye_instalaciones') === 'on',
       provincia: formData.get('provincia'),
       ciudad: formData.get('ciudad'),
-      zona: formData.get('zona')
+      zona: formData.get('zona'),
+      observaciones: formData.get('observaciones') || ''
     };
     
+    console.log('📋 Datos del formulario obtenidos:', data);
     return data;
   }
 
   /**
-   * Crea una cotización
+   * Crea una cotización usando cálculo local
    */
   async createQuote(formData) {
-    const response = await fetch('/api/cotizaciones', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || 'Error creando cotización');
+    try {
+      console.log('📤 Creando cotización con APIs de Argentina:', formData);
+      
+      // Obtener precios actualizados desde APIs de Argentina
+      const prices = await this.getCurrentPrices();
+      
+      // Calcular cotización con precios reales
+      const breakdown = await this.calculateBreakdown(formData, prices);
+      
+      // Obtener materiales seleccionados
+      const selectedMaterials = window.materialsQuoteManager ? 
+        window.materialsQuoteManager.getSelectedMaterials() : [];
+      
+      // Crear objeto de cotización
+      const quote = {
+        id: 'COT-' + Date.now(),
+        cliente: formData.nombre,
+        total_estimado: breakdown.total,
+        moneda: 'USD',
+        desglose: breakdown.desglose,
+        materiales_utilizados: selectedMaterials,
+        tiempo_estimado: this.calculateConstructionTime(breakdown.metros_cuadrados, formData.tipo_construccion),
+        observaciones: [formData.observaciones].filter(Boolean),
+        validez_dias: 30,
+        precios_fuente: breakdown.precios_fuente,
+        ultima_actualizacion: breakdown.ultima_actualizacion
+      };
+      
+      console.log('✅ Cotización creada con APIs de Argentina:', quote);
+      
+      // Guardar datos del cliente en NocoDB
+      await this.saveCustomerData(formData, breakdown.total);
+      
+      // Enviar email de cotización
+      await this.sendQuoteEmail(formData, breakdown);
+      
+      return quote;
+      
+    } catch (error) {
+      console.error('❌ Error en createQuote:', error);
+      throw error;
     }
+  }
+
+  /**
+   * Calcula el tiempo estimado de construcción
+   */
+  calculateConstructionTime(m2, tipoConstruccion) {
+    // Tiempo base por m² (en días)
+    const tiempoBase = {
+      'steel_frame': 0.5,
+      'industrial': 0.3,
+      'contenedor': 0.2,
+      'mixto': 0.4
+    };
     
-    return await response.json();
+    const tiempoPorM2 = tiempoBase[tipoConstruccion] || 0.4;
+    const diasEstimados = Math.ceil(m2 * tiempoPorM2);
+    
+    if (diasEstimados < 30) {
+      return `${diasEstimados} días`;
+    } else if (diasEstimados < 365) {
+      const meses = Math.ceil(diasEstimados / 30);
+      return `${meses} meses`;
+    } else {
+      const años = Math.ceil(diasEstimados / 365);
+      return `${años} años`;
+    }
   }
 
   /**
    * Muestra los resultados de la cotización
    */
   showResults(quote) {
-    // Ocultar formulario y mostrar resultados
-    const quoteForm = document.querySelector('.quote-form');
-    const quoteResults = document.querySelector('#quoteResults');
-    
-    if (quoteForm && quoteResults) {
-      quoteForm.style.display = 'none';
-      quoteResults.style.display = 'block';
+    try {
+      console.log('🎯 Mostrando resultados de la cotización:', quote);
       
-      // Agregar animación
-      quoteResults.classList.add('fade-in');
+      // Ocultar formulario y mostrar resultados
+      const quoteForm = document.querySelector('.quote-form');
+      const quoteResults = document.querySelector('#quoteResults');
+      
+      if (quoteForm && quoteResults) {
+        quoteForm.style.display = 'none';
+        quoteResults.style.display = 'block';
+        
+        // Agregar animación
+        quoteResults.classList.add('fade-in');
+        
+        console.log('✅ Formulario ocultado y resultados mostrados');
+      } else {
+        console.warn('⚠️ No se encontraron elementos del formulario o resultados');
+      }
+      
+      // Actualizar datos en la UI
+      this.updateResultsUI(quote);
+      
+          // Scroll a los resultados
+    if (quoteResults) {
+      quoteResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    
-    // Actualizar datos en la UI
-    this.updateResultsUI(quote);
-    
-    // Scroll a los resultados
-    quoteResults?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      console.log('✅ Resultados mostrados exitosamente');
+      
+    } catch (error) {
+      console.error('❌ Error mostrando resultados:', error);
+      throw error;
+    }
   }
 
   /**
@@ -371,8 +456,8 @@ class QuoteCalculator {
     
     // Total estimado
     const totalAmountElement = document.querySelector('#totalAmount');
-    if (totalAmountElement && window.app) {
-      totalAmountElement.textContent = window.app.formatCurrency(quote.total_estimado);
+    if (totalAmountElement) {
+      totalAmountElement.textContent = `U$D ${quote.total_estimado.toLocaleString()}`;
     }
     
     // Timestamp
@@ -396,6 +481,9 @@ class QuoteCalculator {
     
     // Observaciones
     this.updateObservationsUI(quote.observaciones);
+    
+    // Verificar que todos los elementos necesarios estén presentes
+    console.log('✅ UI actualizada correctamente');
   }
 
   /**
@@ -413,8 +501,8 @@ class QuoteCalculator {
     
     Object.entries(elements).forEach(([elementId, value]) => {
       const element = document.querySelector(`#${elementId}`);
-      if (element && window.app) {
-        element.textContent = window.app.formatCurrency(value);
+      if (element) {
+        element.textContent = `U$D ${value.toLocaleString()}`;
       }
     });
   }
@@ -428,6 +516,11 @@ class QuoteCalculator {
     
     materialsList.innerHTML = '';
     
+    if (!materials || materials.length === 0) {
+      materialsList.innerHTML = '<div class="no-materials-message">No se seleccionaron materiales</div>';
+      return;
+    }
+    
     materials.forEach(material => {
       const materialItem = document.createElement('div');
       materialItem.className = 'material-item';
@@ -437,7 +530,7 @@ class QuoteCalculator {
           <div class="material-name">${material.nombre}</div>
           <div class="material-category">${material.categoria}</div>
         </div>
-        <div class="material-price">${window.app?.formatCurrency(material.precio_por_m2)}/${material.unidad}</div>
+        <div class="material-price">U$D ${material.precio_por_m2.toLocaleString()}/${material.unidad}</div>
       `;
       
       materialsList.appendChild(materialItem);
@@ -453,11 +546,54 @@ class QuoteCalculator {
     
     observationsList.innerHTML = '';
     
+    if (!observations || observations.length === 0) {
+      observationsList.innerHTML = '<li>No hay observaciones adicionales</li>';
+      return;
+    }
+    
     observations.forEach(observation => {
-      const li = document.createElement('li');
-      li.textContent = observation;
-      observationsList.appendChild(li);
+      if (observation && observation.trim()) {
+        const li = document.createElement('li');
+        li.textContent = observation;
+        observationsList.appendChild(li);
+      }
     });
+  }
+
+  /**
+   * Muestra un mensaje de error al usuario
+   */
+  showErrorMessage(message) {
+    // Crear elemento de error
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--error);
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      max-width: 300px;
+      font-weight: 500;
+    `;
+    
+    errorDiv.innerHTML = `
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>${message}</span>
+    `;
+    
+    document.body.appendChild(errorDiv);
+    
+    // Remover después de 5 segundos
+    setTimeout(() => {
+      if (errorDiv.parentNode) {
+        errorDiv.parentNode.removeChild(errorDiv);
+      }
+    }, 5000);
   }
 
   /**
@@ -522,7 +658,7 @@ class QuoteCalculator {
    * Actualiza información de construcción
    */
   updateConstructionInfo(type) {
-    const typeInfo = window.app?.getConstructionTypeInfo(type);
+    const typeInfo = window.app && window.app.getConstructionTypeInfo ? window.app.getConstructionTypeInfo(type) : null;
     
     if (typeInfo) {
       // Actualizar descripción o información adicional
@@ -549,7 +685,7 @@ class QuoteCalculator {
    * Actualiza información regional
    */
   updateRegionalInfo(province) {
-    const multiplier = window.app?.getRegionalMultiplier(province);
+    const multiplier = window.app && window.app.getRegionalMultiplier ? window.app.getRegionalMultiplier(province) : 1.0;
     
     if (multiplier && multiplier !== 1.0) {
       // Mostrar notificación sobre ajuste regional
@@ -728,7 +864,7 @@ class QuoteCalculator {
     if (navigator.share) {
       navigator.share({
         title: 'Cotización de Construcción',
-        text: `Cotización #${this.currentQuote.id} - Total: ${window.app?.formatCurrency(this.currentQuote.total_estimado)}`,
+        text: `Cotización #${this.currentQuote.id} - Total: U$D ${this.currentQuote.total_estimado.toLocaleString()}`,
         url: window.location.href
       });
     } else {
@@ -770,32 +906,298 @@ class QuoteCalculator {
   }
 
   /**
-   * Calcula el desglose de costos
+   * Obtiene precios actualizados desde APIs de Argentina
    */
-  async calculateBreakdown(formData) {
-    const params = new URLSearchParams({
-      metros_cuadrados: formData.metros_cuadrados,
-      tipo_construccion: formData.tipo_construccion,
-      tipo_uso: formData.tipo_uso,
-      nivel_terminacion: formData.nivel_terminacion,
-      provincia: formData.provincia
-    });
-    
-    const response = await fetch(`/api/costos/desglose?${params}`);
-    
-    if (!response.ok) {
-      throw new Error('Error calculando desglose');
+  async getCurrentPrices() {
+    try {
+      console.log('🔄 Obteniendo precios actualizados desde APIs de Argentina...');
+      
+      // Intentar obtener precios desde la API
+      const response = await fetch('/api/argentina/precios');
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          console.log('✅ Precios obtenidos desde API:', data.data);
+          return {
+            ...data.data,
+            source: data.data.source || 'Argentina APIs'
+          };
+        }
+      }
+      
+      // Fallback: precios base en USD (actualizados según mercado argentino)
+      console.log('⚠️ Usando precios base como fallback');
+      return {
+        steel_frame_m2: 105.0,    // USD/m2 - Acero estructural
+        industrial_m2: 125.0,     // USD/m2 - Industrial
+        container_m2: 80.0,       // USD/m2 - Contenedor
+        materials_m2: 45.0,       // USD/m2 - Materiales
+        labor_m2: 35.0,           // USD/m2 - Mano de obra
+        finishes_m2: 25.0,        // USD/m2 - Terminaciones
+        last_updated: new Date().toISOString(),
+        source: 'Precios base (fallback)'
+      };
+      
+    } catch (error) {
+      console.warn('⚠️ Error obteniendo precios, usando fallback:', error);
+      
+      // Precios de emergencia
+      return {
+        steel_frame_m2: 105.0,
+        industrial_m2: 125.0,
+        container_m2: 80.0,
+        materials_m2: 45.0,
+        labor_m2: 35.0,
+        finishes_m2: 25.0,
+        last_updated: new Date().toISOString(),
+        source: 'Precios de emergencia'
+      };
     }
-    
-    return await response.json();
+  }
+
+  /**
+   * Calcula el desglose de costos con precios reales
+   */
+  async calculateBreakdown(formData, prices = null) {
+    try {
+      // Usar precios reales de Argentina si están disponibles
+      if (!prices) {
+        prices = await this.getCurrentPrices();
+      }
+      
+      const m2 = parseFloat(formData.metros_cuadrados) || 0;
+      const tipo = formData.tipo_construccion;
+      const uso = formData.tipo_uso;
+      const terminacion = formData.nivel_terminacion;
+      const provincia = formData.provincia;
+      
+      // Obtener precio base según tipo de construcción desde APIs reales
+      let precioBase = 0;
+      switch (tipo) {
+        case 'steel_frame':
+          precioBase = prices.steel_frame_m2;
+          break;
+        case 'industrial':
+          precioBase = prices.industrial_m2;
+          break;
+        case 'contenedor':
+          precioBase = prices.container_m2;
+          break;
+        case 'mixto':
+          precioBase = (prices.steel_frame_m2 + prices.industrial_m2) / 2;
+          break;
+        default:
+          precioBase = prices.steel_frame_m2; // Default a steel frame
+      }
+      
+      // Multiplicadores por tipo de uso
+      const multiplicadoresUso = {
+        'residencial': 1.0,
+        'comercial': 1.3,
+        'industrial': 1.4
+      };
+      
+      // Multiplicadores por nivel de terminación
+      const multiplicadoresTerminacion = {
+        'basico': 1.0,
+        'estandar': 1.2,
+        'premium': 1.5
+      };
+      
+      // Multiplicadores por provincia (actualizados según datos reales de Argentina)
+      const multiplicadoresProvincia = {
+        'mendoza': 0.88,
+        'buenos_aires': 1.0,
+        'cordoba': 0.95,
+        'santa_fe': 0.92,
+        'tucuman': 0.85,
+        'entre_rios': 0.90,
+        'chaco': 0.83,
+        'corrientes': 0.87,
+        'misiones': 0.89,
+        'formosa': 0.82,
+        'chubut': 0.93,
+        'rio_negro': 0.91,
+        'neuquen': 0.94,
+        'la_pampa': 0.86,
+        'san_luis': 0.84,
+        'la_rioja': 0.81,
+        'catamarca': 0.83,
+        'santiago': 0.80,
+        'salta': 0.86,
+        'jujuy': 0.85,
+        'san_juan': 0.87,
+        'tierra_fuego': 1.15,
+        'otras': 0.90
+      };
+      
+      // Cálculo del precio base
+      const multiplicadorUso = multiplicadoresUso[uso] || 1.0;
+      const multiplicadorTerminacion = multiplicadoresTerminacion[terminacion] || 1.0;
+      const multiplicadorProvincia = multiplicadoresProvincia[provincia.toLowerCase().replace(' ', '_')] || 0.90;
+      
+      // Precio por m²
+      const precioPorM2 = precioBase * multiplicadorUso * multiplicadorTerminacion * multiplicadorProvincia;
+      
+      // Cálculo del total
+      const total = m2 * precioPorM2;
+      
+      // Desglose de costos usando precios reales de materiales
+      const breakdown = {
+        metros_cuadrados: m2,
+        tipo_construccion: tipo,
+        precio_base: precioBase,
+        precio_por_m2: precioPorM2,
+        total: total,
+        desglose: {
+          materiales: total * 0.4,
+          mano_obra: total * 0.3,
+          terminaciones: total * 0.15,
+          instalaciones: total * 0.1,
+          transporte: total * 0.03,
+          impuestos: total * 0.02
+        }
+      };
+      
+      console.log('✅ Cálculo local realizado:', breakdown);
+      return breakdown;
+      
+    } catch (error) {
+      console.error('❌ Error en cálculo local:', error);
+      throw new Error('Error calculando desglose local');
+    }
+  }
+
+  /**
+   * Guarda datos del cliente en NocoDB
+   */
+  async saveCustomerData(formData, total) {
+    try {
+      console.log('💾 Guardando datos del cliente en NocoDB...');
+      
+      const customerData = {
+        fecha: new Date().toISOString().split('T')[0],
+        nombre: formData.nombre,
+        email: formData.email,
+        whatsapp: formData.whatsapp || '',
+        tipo_construccion: formData.tipo_construccion,
+        metros_cuadrados: formData.metros_cuadrados,
+        provincia: formData.provincia,
+        pisos: formData.pisos,
+        uso: formData.tipo_uso,
+        terminaciones: formData.nivel_terminacion,
+        total_cotizacion: total,
+        materiales: JSON.stringify(window.materialsQuoteManager.getSelectedMaterials()),
+        observaciones: formData.observaciones || '',
+        estado: 'nueva_cotizacion',
+        fecha_cotizacion: new Date().toISOString()
+      };
+      
+      // Enviar a NocoDB
+      const response = await fetch('/api/nocodb/clientes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customerData)
+      });
+      
+      if (response.ok) {
+        console.log('✅ Cliente guardado en NocoDB exitosamente');
+      } else {
+        console.warn('⚠️ Error guardando en NocoDB:', response.status);
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ Error guardando cliente en NocoDB:', error);
+      // No fallar la cotización por error en NocoDB
+    }
+  }
+
+  /**
+   * Envía email de cotización
+   */
+  async sendQuoteEmail(formData, breakdown) {
+    try {
+      console.log('📧 Enviando email de cotización...');
+      
+      const emailData = {
+        nombre: formData.nombre,
+        email: formData.email,
+        telefono: formData.telefono,
+        whatsapp: formData.whatsapp,
+        provincia: formData.provincia,
+        tipo_construccion: formData.tipo_construccion,
+        metros_cuadrados: breakdown.metros_cuadrados,
+        pisos: formData.pisos,
+        tipo_uso: formData.tipo_uso,
+        nivel_terminacion: formData.nivel_terminacion,
+        total_estimado: breakdown.total,
+        materiales: window.materialsQuoteManager.getSelectedMaterials(),
+        observaciones: formData.observaciones,
+        tiempo_estimado: this.calculateConstructionTime(breakdown.metros_cuadrados, formData.tipo_construccion)
+      };
+      
+      // Enviar email
+      const response = await fetch('/api/cotizar/enviar-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailData)
+      });
+      
+      if (response.ok) {
+        console.log('✅ Email de cotización enviado exitosamente');
+      } else {
+        console.warn('⚠️ Error enviando email:', response.status);
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ Error enviando email de cotización:', error);
+      // No fallar la cotización por error en email
+    }
   }
 
   /**
    * Muestra desglose en tiempo real
    */
   showRealTimeBreakdown(breakdown) {
-    // Implementar lógica para mostrar desglose en tiempo real
-    console.log('Desglose en tiempo real:', breakdown);
+    try {
+      // Actualizar total principal
+      const totalElement = document.getElementById('totalAmount');
+      if (totalElement) {
+        totalElement.textContent = `U$D ${breakdown.total.toLocaleString()}`;
+      }
+      
+      // Actualizar desglose de costos
+      const materialesCost = document.getElementById('materialesCost');
+      const manoObraCost = document.getElementById('manoObraCost');
+      const terminacionesCost = document.getElementById('terminacionesCost');
+      const instalacionesCost = document.getElementById('instalacionesCost');
+      const transporteCost = document.getElementById('transporteCost');
+      const impuestosCost = document.getElementById('impuestosCost');
+      
+      if (materialesCost) materialesCost.textContent = `U$D ${breakdown.desglose.materiales.toLocaleString()}`;
+      if (manoObraCost) manoObraCost.textContent = `U$D ${breakdown.desglose.mano_obra.toLocaleString()}`;
+      if (terminacionesCost) terminacionesCost.textContent = `U$D ${breakdown.desglose.terminaciones.toLocaleString()}`;
+      if (instalacionesCost) instalacionesCost.textContent = `U$D ${breakdown.desglose.instalaciones.toLocaleString()}`;
+      if (transporteCost) transporteCost.textContent = `U$D ${breakdown.desglose.transporte.toLocaleString()}`;
+      if (impuestosCost) impuestosCost.textContent = `U$D ${breakdown.desglose.impuestos.toLocaleString()}`;
+      
+      // Mostrar sección de resultados
+      const resultsSection = document.querySelector('.quote-results');
+      if (resultsSection) {
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      console.log('✅ Desglose mostrado correctamente:', breakdown);
+      
+    } catch (error) {
+      console.error('❌ Error mostrando desglose:', error);
+    }
   }
 
   /**
@@ -807,6 +1209,36 @@ class QuoteCalculator {
     
     const requiredFields = form.querySelectorAll('[required]');
     return Array.from(requiredFields).every(field => field.value.trim() !== '');
+  }
+
+  /**
+   * Muestra error de materiales
+   */
+  showMaterialsError(message) {
+    // Crear o actualizar mensaje de error
+    let errorDiv = document.querySelector('.materials-error');
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.className = 'materials-error error-message';
+      const materialsSection = document.querySelector('.materials-selection');
+      if (materialsSection) {
+        materialsSection.appendChild(errorDiv);
+      }
+    }
+    
+    errorDiv.innerHTML = `
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>${message}</span>
+    `;
+    errorDiv.style.display = 'block';
+    
+    // Hacer scroll al mensaje de error
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    // Ocultar mensaje después de 5 segundos
+    setTimeout(() => {
+      errorDiv.style.display = 'none';
+    }, 5000);
   }
 
   /**

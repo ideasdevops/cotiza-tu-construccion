@@ -18,18 +18,18 @@ body {
 
 /* ===== VARIABLES CSS ===== */
 :root {
-  /* Colores principales */
-  --primary-color: #2563eb;
-  --primary-dark: #1d4ed8;
-  --primary-light: #3b82f6;
+  /* Colores principales - Sumpetrol */
+  --primary-color: #6B2E3A;
+  --primary-dark: #4A1E28;
+  --primary-light: #8A3E4A;
   
-  --secondary-color: #10b981;
-  --secondary-dark: #059669;
-  --secondary-light: #34d399;
+  --secondary-color: #4A4A4A;
+  --secondary-dark: #2A2A2A;
+  --secondary-light: #6A6A6A;
   
-  --accent-color: #f59e0b;
-  --accent-dark: #d97706;
-  --accent-light: #fbbf24;
+  --accent-color: #8A3E4A;
+  --accent-dark: #6B2E3A;
+  --accent-light: #A94E5A;
   
   /* Colores neutros */
   --white: #ffffff;
@@ -557,4 +557,148 @@ a:hover {
   h2 {
     font-size: 1.75rem;
   }
+}
+
+/* ===== BOTÓN SUMPETROL ===== */
+.cta-btn.sumpetrol {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.cta-btn.sumpetrol:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== BOTONES DEL MODAL DE VISTA PREVIA ===== */
+.modal-preview .btn.preview {
+  background: var(--primary-color) !important;
+  color: white !important;
+  border: 2px solid var(--primary-color) !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.modal-preview .btn.preview:hover {
+  background: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-preview .btn.calculate {
+  background: var(--primary-color) !important;
+  color: white !important;
+  border: 2px solid var(--primary-color) !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.modal-preview .btn.calculate:hover {
+  background: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-preview .btn.reset {
+  background: white !important;
+  color: var(--primary-color) !important;
+  border: 2px solid var(--primary-color) !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modal-preview .btn.reset:hover {
+  background: var(--primary-color) !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== MODAL DE VISTA PREVIA ===== */
+.modal-preview {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-preview .modal-header {
+  background: var(--primary-color);
+  color: white;
+  border-bottom: 2px solid var(--primary-dark);
+}
+
+.modal-preview .modal-body {
+  background: white;
+  border-radius: 0 0 12px 12px;
+}
+
+.modal-preview .btn-close {
+  background: white;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.modal-preview .btn-close:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* ===== MODAL DE MATERIALES ===== */
+.materials-modal {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(15px);
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+}
+
+.materials-modal .modal-header {
+  background: var(--primary-color);
+  color: white;
+  border-bottom: 2px solid var(--primary-dark);
+}
+
+.materials-modal .modal-body {
+  background: white;
+  border-radius: 0 0 12px 12px;
+}
+
+.materials-modal .btn-close {
+  background: white;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.materials-modal .btn-close:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: scale(1.1);
 }
