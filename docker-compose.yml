@@ -1,22 +1,13 @@
 services:
-  python:
-    image: python:3.11-slim
-    working_dir: /app/backend-python
-    command: bash -lc "pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+  python-backend:
+    build: .
+    container_name: cotizador-construccion-backend
+    working_dir: /app
+    command: python -m uvicorn backend-python.app.main:app --host 0.0.0.0 --port 8000
     volumes:
       - ./:/app
     ports:
       - "8000:8000"
     environment:
       - PYTHONPATH=/app/backend-python
-  node:
-    image: node:20
-    working_dir: /app/backend-node
-    command: bash -lc "npm install && npm run dev"
-    volumes:
-      - ./:/app
-    environment:
-      - PY_SERVICE_URL=http://python:8000
-      - PORT=8005
-    ports:
-      - "8005:8005"
+    restart: unless-stopped
