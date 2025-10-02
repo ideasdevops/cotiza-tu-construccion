@@ -153,11 +153,19 @@ async def enviar_cotizacion_email(
 ):
     """Envía la cotización por email al cliente"""
     try:
+        logger.info("📧 Recibiendo solicitud de envío de email de cotización...")
+        
         # Obtener datos del body
         body = await request.json()
+        logger.info(f"📋 Datos recibidos: {body}")
         
         customer_email = body.get('email')
         customer_name = body.get('nombre')
+        
+        if not customer_email or not customer_name:
+            logger.error("❌ Faltan datos requeridos (email o nombre)")
+            raise HTTPException(status_code=400, detail="Faltan datos requeridos (email o nombre)")
+        
         quote_data = {
             'nombre': customer_name,
             'email': customer_email,
@@ -175,7 +183,8 @@ async def enviar_cotizacion_email(
             'tiempo_estimado': body.get('tiempo_estimado')
         }
         
-        logger.info(f"Enviando email de cotización a {customer_email} para {customer_name}")
+        logger.info(f"👤 Cliente: {customer_name}, Email: {customer_email}")
+        logger.info(f"📊 Tipo construcción: {quote_data.get('tipo_construccion')}, Área: {quote_data.get('metros_cuadrados')} m²")
         
         # Generar PDF en background
         background_tasks.add_task(
@@ -185,36 +194,48 @@ async def enviar_cotizacion_email(
             quote_data
         )
         
+        logger.info("✅ Tarea de envío de email agregada a background tasks")
+        
         return {
             "success": True,
             "message": "Email de cotización enviado exitosamente",
             "status": "enviado"
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error enviando email: {e}")
-        raise HTTPException(status_code=500, detail=f"Error enviando email: {str(e)}")
+        logger.error(f"❌ Error enviando email: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 async def _generate_and_send_pdf_email(customer_email: str, customer_name: str, quote_data: Dict[str, Any]):
     """Función helper para generar PDF y enviar email en background"""
     try:
+        logger.info(f"📧 Generando PDF y enviando email a {customer_email}...")
+        
         # Generar PDF
         pdf_path = pdf_service.generate_quote_pdf(quote_data, {"nombre": customer_name, "email": customer_email})
+        logger.info(f"✅ PDF generado: {pdf_path}")
         
-        # Enviar email con PDF
-        success = email_service.send_quote_email(customer_email, customer_name, quote_data, pdf_path)
+        # Enviar email usando el servicio mejorado
+        success = improved_email_service.send_construction_quote_email(customer_email, customer_name, quote_data)
         
         # Limpiar archivo temporal
         if os.path.exists(pdf_path):
             os.remove(pdf_path)
+            logger.info("🗑️ Archivo temporal PDF eliminado")
             
         if success:
-            logger.info(f"Email con PDF enviado exitosamente a {customer_email}")
+            logger.info(f"✅ Email de cotización enviado exitosamente a {customer_email}")
         else:
-            logger.error(f"Error enviando email a {customer_email}")
+            logger.error(f"❌ Error enviando email a {customer_email}")
             
     except Exception as e:
-        logger.error(f"Error en proceso de email con PDF: {e}")
+        logger.error(f"❌ Error en proceso de email con PDF: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
 
 @app.post("/contacto/enviar")
 async def enviar_contacto(
@@ -277,16 +298,25 @@ async def enviar_contacto(
         logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
-@app.get("/cotizar/descargar-pdf")
-async def descargar_cotizacion_pdf(
-    customer_name: str,
-    customer_email: str,
-    quote_data: Dict[str, Any]
-):
+@app.post("/cotizar/descargar-pdf")
+async def descargar_cotizacion_pdf(request: Request):
     """Genera y descarga PDF de la cotización"""
     try:
+        logger.info("📄 Generando PDF de cotización...")
+        
+        body = await request.json()
+        logger.info(f"📋 Datos recibidos para PDF: {body}")
+        
+        customer_name = body.get('customer_name', 'Cliente')
+        customer_email = body.get('customer_email', '')
+        quote_data = body.get('quote_data', {})
+        
+        logger.info(f"👤 Cliente: {customer_name}, Email: {customer_email}")
+        
         # Generar PDF
         pdf_path = pdf_service.generate_quote_pdf(quote_data, {"nombre": customer_name, "email": customer_email})
+        
+        logger.info(f"✅ PDF generado exitosamente: {pdf_path}")
         
         # Retornar archivo para descarga
         return FileResponse(
@@ -296,7 +326,9 @@ async def descargar_cotizacion_pdf(
         )
         
     except Exception as e:
-        logger.error(f"Error generando PDF: {e}")
+        logger.error(f"❌ Error generando PDF: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Error generando PDF")
 
 @app.post("/nocodb/clientes")
