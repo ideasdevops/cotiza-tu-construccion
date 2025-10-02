@@ -13,9 +13,7 @@ from .models import (
     CotizacionRequest, CotizacionResponse, Material, 
     PrecioMaterial, CalculoCostos
 )
-from .calculator import ConstructionCalculator
 from .price_service import PriceService
-from .email_service import email_service
 from .email_service_improved import improved_email_service
 from .nocodb_service import nocodb_service
 from .pdf_service import pdf_service
@@ -81,7 +79,6 @@ app.add_middleware(
 )
 
 # Instanciar servicios
-calculator = ConstructionCalculator()
 price_service = PriceService()
 
 @app.get("/")
