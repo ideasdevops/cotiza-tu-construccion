@@ -30,6 +30,20 @@ async def health_check():
         "timestamp": datetime.now().isoformat()
     }
 
+@router.get("/test")
+async def test_endpoint():
+    """Endpoint de prueba para verificar conectividad"""
+    return {
+        "message": "Construction calculator API is working!",
+        "timestamp": datetime.now().isoformat(),
+        "endpoints": [
+            "/api/construction/health",
+            "/api/construction/test", 
+            "/api/construction/estimate",
+            "/api/construction/quote"
+        ]
+    }
+
 @router.post("/estimate")
 async def quick_estimate(request: Request):
     """
@@ -82,7 +96,7 @@ async def quick_estimate(request: Request):
         logger.error(f"❌ Error en estimación rápida: {e}")
         import traceback
         logger.error(f"❌ Traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
 @router.post("/quote")
 async def detailed_quote(request: Request, background_tasks: BackgroundTasks):
