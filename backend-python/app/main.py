@@ -16,11 +16,47 @@ from .models import (
 from .calculator import ConstructionCalculator
 from .price_service import PriceService
 from .email_service import email_service
+from .email_service_improved import improved_email_service
 from .nocodb_service import nocodb_service
 from .pdf_service import pdf_service
 from .argentina_apis import argentina_api_service, get_current_prices, get_current_exchange_rate
 from .price_updater import price_updater_service, start_price_updater, get_price_updater_status
 from .config import settings
+
+# Función wrapper para guardar datos en NocoDB
+def save_data_to_nocodb(data_type: str, data: Dict[str, Any]):
+    """Wrapper síncrono para guardar datos en NocoDB"""
+    import asyncio
+    try:
+        logger.info(f"🔄 Guardando {data_type} en NocoDB: {data.get('nombre', data.get('customer_name', 'Sin nombre'))}")
+        logger.info(f"📊 Datos recibidos: {data}")
+        
+        # Crear nuevo loop de eventos para la tarea async
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            if data_type == "contact":
+                success = loop.run_until_complete(nocodb_service.save_customer_data(data))
+            elif data_type == "quote":
+                success = loop.run_until_complete(nocodb_service.save_quote_data(data))
+            else:
+                logger.error(f"❌ Tipo de datos no reconocido: {data_type}")
+                return False
+                
+            if success:
+                logger.info(f"✅ {data_type} guardado exitosamente en NocoDB")
+            else:
+                logger.error(f"❌ Error guardando {data_type} en NocoDB")
+            return success
+        finally:
+            loop.close()
+            
+    except Exception as e:
+        logger.error(f"❌ Error en wrapper de guardado de {data_type}: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
+        return False
 
 # Configuración de logging
 logging.basicConfig(level=logging.INFO)
@@ -182,40 +218,64 @@ async def _generate_and_send_pdf_email(customer_email: str, customer_name: str, 
 
 @app.post("/contacto/enviar")
 async def enviar_contacto(
-    nombre: str,
-    email: str,
-    mensaje: str,
+    request: Request,
     background_tasks: BackgroundTasks
 ):
     """Envía formulario de contacto"""
     try:
-        # Enviar email a marketing@sumpetrol.com.ar
+        logger.info("📧 Recibiendo formulario de contacto...")
+        
+        body = await request.json()
+        logger.info(f"📋 Datos recibidos: {body}")
+        
+        nombre = body.get('name') or body.get('nombre', '')
+        email = body.get('email', '')
+        telefono = body.get('phone') or body.get('telefono', '')
+        mensaje = body.get('message') or body.get('mensaje', '')
+        
+        logger.info(f"📝 Datos extraídos - Nombre: {nombre}, Email: {email}, Teléfono: {telefono}")
+        
+        if not nombre or not email or not mensaje:
+            logger.error("❌ Faltan datos requeridos")
+            raise HTTPException(status_code=400, detail="Faltan datos requeridos")
+        
+        # Enviar email usando el servicio mejorado
         background_tasks.add_task(
-            email_service.send_contact_form_email,
+            improved_email_service.send_contact_form_email,
             nombre,
             email,
+            telefono,
             mensaje
         )
         
-        # Guardar en Nocodb
+        # Guardar en Nocodb usando wrapper
         background_tasks.add_task(
-            nocodb_service.save_contact_form,
+            save_data_to_nocodb,
+            "contact",
             {
                 "fecha": datetime.now().strftime("%Y-%m-%d"),
                 "nombre": nombre,
                 "email": email,
+                "telefono": telefono,
                 "mensaje": mensaje
             }
         )
         
+        logger.info("✅ Formulario de contacto procesado exitosamente")
+        
         return {
+            "success": True,
             "message": "Mensaje de contacto enviado exitosamente",
             "status": "enviado"
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error enviando contacto: {e}")
-        raise HTTPException(status_code=500, detail="Error enviando mensaje de contacto")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @app.get("/cotizar/descargar-pdf")
 async def descargar_cotizacion_pdf(
@@ -661,6 +721,71 @@ async def forzar_actualizacion():
     except Exception as e:
         logger.error(f"Error en actualización forzada: {e}")
         raise HTTPException(status_code=500, detail="Error en actualización forzada")
+
+# ============================================================================
+# ENDPOINTS ADICIONALES PARA COMPATIBILIDAD CON FRONTEND
+# ============================================================================
+
+@app.get("/api/construccion/tipos")
+async def api_tipos_construccion():
+    """Endpoint API para tipos de construcción"""
+    return await obtener_tipos_construccion()
+
+@app.get("/api/construccion/terminaciones")
+async def api_niveles_terminacion():
+    """Endpoint API para niveles de terminación"""
+    return await obtener_niveles_terminacion()
+
+@app.get("/api/construccion/usos")
+async def api_tipos_uso():
+    """Endpoint API para tipos de uso"""
+    return await obtener_tipos_uso()
+
+@app.get("/api/materiales/precios")
+async def api_precios_materiales():
+    """Endpoint API para precios de materiales"""
+    return await obtener_precios_materiales()
+
+@app.get("/api/regiones/multiplicadores")
+async def api_multiplicadores_regionales():
+    """Endpoint API para multiplicadores regionales"""
+    return await obtener_multiplicadores_regionales()
+
+@app.get("/api/costos/desglose")
+async def api_desglose_costos(
+    metros_cuadrados: float,
+    tipo_construccion: str,
+    tipo_uso: str,
+    nivel_terminacion: str,
+    provincia: str = "buenos_aires"
+):
+    """Endpoint API para desglose de costos"""
+    return await obtener_desglose_costos(
+        metros_cuadrados=metros_cuadrados,
+        tipo_construccion=tipo_construccion,
+        tipo_uso=tipo_uso,
+        nivel_terminacion=nivel_terminacion,
+        provincia=provincia
+    )
+
+@app.post("/api/cotizaciones")
+async def api_crear_cotizacion(request: CotizacionRequest, background_tasks: BackgroundTasks):
+    """Endpoint API para crear cotización"""
+    return await crear_cotizacion(request, background_tasks)
+
+@app.get("/api/cotizaciones/{cotizacion_id}")
+async def api_obtener_cotizacion(cotizacion_id: str):
+    """Endpoint API para obtener cotización por ID"""
+    try:
+        # En una implementación real, esto vendría de una base de datos
+        return {
+            "message": "Cotización obtenida",
+            "id": cotizacion_id,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error obteniendo cotización {cotizacion_id}: {e}")
+        raise HTTPException(status_code=500, detail="Error obteniendo cotización")
 
 # ============================================================================
 # EVENTOS DE INICIO Y CIERRE

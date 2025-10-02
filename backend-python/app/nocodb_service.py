@@ -13,11 +13,19 @@ logger = logging.getLogger(__name__)
 
 class NocodbService:
     def __init__(self):
-        self.base_url = settings.NOCODB_URL
-        self.token = settings.NOCODB_TOKEN
-        self.base_id = settings.NOCODB_BASE_ID
+        # Usar nuevas variables primero, fallback a legacy
+        self.base_url = getattr(settings, 'NC_DB_URL', settings.NOCODB_URL)
+        self.token = getattr(settings, 'NC_TOKEN', settings.NOCODB_TOKEN)
+        self.base_id = getattr(settings, 'NC_DB_ID', settings.NOCODB_BASE_ID)
         self.table_id = settings.NOCODB_TABLE_ID
         self.api_url = f"{self.base_url}/api/v1/db/data/v1/{self.base_id}/{self.table_id}"
+        
+        logger.info(f"🔗 NocoDB configurado:")
+        logger.info(f"   URL: {self.base_url}")
+        logger.info(f"   Token: {self.token[:10]}...")
+        logger.info(f"   Base ID: {self.base_id}")
+        logger.info(f"   Table ID: {self.table_id}")
+        logger.info(f"   API URL: {self.api_url}")
         
         self.headers = {
             "xc-token": self.token,

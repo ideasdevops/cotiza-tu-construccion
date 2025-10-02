@@ -5,7 +5,7 @@ Credenciales SMTP y configuración de Nocodb
 
 import os
 from typing import Optional
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Configuración SMTP de Sumpetrol
@@ -13,15 +13,20 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 465
     SMTP_USERNAME: str = "novedades@sumpetrol.com.ar"
     SMTP_PASSWORD: str = "Novedad3s2k24@@"
-    SMTP_USE_TLS: bool = True
+    SMTP_USE_TLS: bool = False
     SMTP_USE_SSL: bool = True
     
     # Email de recepción de consultas
     CONTACT_EMAIL: str = "marketing@sumpetrol.com.ar"
     
-    # Configuración de Nocodb
+    # Configuración de Nocodb - Variables correctas
+    NC_DB_URL: str = "https://bots-nocodb.prskfv.easypanel.host"
+    NC_TOKEN: str = "_H3KGTFKGtgMb3pQU5GXR2i17glb1ytl3hxYvVkT"
+    NC_DB_ID: str = "pjo0a1kfnvm1ai3"
+    
+    # Variables legacy para compatibilidad
     NOCODB_URL: str = "https://bots-nocodb.prskfv.easypanel.host"
-    NOCODB_TOKEN: str = "JvshcwW9JUK_sR4yT7H5r7ygSA2BPFAGNI8nSeWF"
+    NOCODB_TOKEN: str = "_H3KGTFKGtgMb3pQU5GXR2i17glb1ytl3hxYvVkT"
     NOCODB_BASE_ID: str = "pjo0a1kfnvm1ai3"
     NOCODB_TABLE_ID: str = "m7i75nx5rkwockg"
     
