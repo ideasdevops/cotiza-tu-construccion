@@ -776,7 +776,116 @@ async def api_tipos_uso():
 @app.get("/api/materiales/precios")
 async def api_precios_materiales():
     """Endpoint API para precios de materiales"""
-    return await obtener_precios_materiales()
+    try:
+        logger.info("📦 Obteniendo precios de materiales...")
+        
+        # Intentar obtener materiales del servicio
+        try:
+            materiales = price_service.get_all_base_prices()
+            materiales_data = [
+                {
+                    "id": f"mat_{i}",
+                    "nombre": mat.nombre,
+                    "categoria": mat.categoria,
+                    "descripcion": f"Material {mat.nombre} para construcción",
+                    "precio": mat.precio_por_m2,
+                    "unidad": mat.unidad,
+                    "marca": "Sumpetrol",
+                    "modelo": f"MOD-{i}",
+                    "dimensiones": "Estándar",
+                    "peso": "Variable"
+                }
+                for i, mat in enumerate(materiales.values())
+            ]
+            
+            logger.info(f"✅ {len(materiales_data)} materiales obtenidos del servicio")
+            return materiales_data
+            
+        except Exception as e:
+            logger.warning(f"⚠️ Error obteniendo materiales del servicio: {e}")
+            # Retornar materiales por defecto
+            return get_default_materials()
+            
+    except Exception as e:
+        logger.error(f"❌ Error en endpoint de materiales: {e}")
+        return get_default_materials()
+
+def get_default_materials():
+    """Retorna materiales por defecto si falla la API"""
+    return [
+        {
+            "id": "mat_1",
+            "nombre": "Perfil C 100x50x2mm",
+            "categoria": "estructura",
+            "descripcion": "Perfil de acero galvanizado para estructura steel frame",
+            "precio": 25.50,
+            "unidad": "metro lineal",
+            "marca": "Sumpetrol",
+            "modelo": "C-100-50-2",
+            "dimensiones": "100x50x2mm",
+            "peso": "2.5 kg/m"
+        },
+        {
+            "id": "mat_2",
+            "nombre": "Panel OSB 15mm",
+            "categoria": "estructura",
+            "descripcion": "Panel estructural OSB para revestimiento",
+            "precio": 18.75,
+            "unidad": "m²",
+            "marca": "Standard",
+            "modelo": "OSB-15",
+            "dimensiones": "1220x2440x15mm",
+            "peso": "12 kg/m²"
+        },
+        {
+            "id": "mat_3",
+            "nombre": "Aislante Lana de Vidrio 100mm",
+            "categoria": "aislamiento",
+            "descripcion": "Aislante térmico y acústico de lana de vidrio",
+            "precio": 8.90,
+            "unidad": "m²",
+            "marca": "Knauf",
+            "modelo": "LV-100",
+            "dimensiones": "1200x600x100mm",
+            "peso": "1.2 kg/m²"
+        },
+        {
+            "id": "mat_4",
+            "nombre": "Membrana Hidrófuga",
+            "categoria": "cubierta",
+            "descripcion": "Membrana impermeabilizante para techos",
+            "precio": 12.30,
+            "unidad": "m²",
+            "marca": "Sika",
+            "modelo": "MB-200",
+            "dimensiones": "1x10m",
+            "peso": "0.8 kg/m²"
+        },
+        {
+            "id": "mat_5",
+            "nombre": "Placa de Yeso 12.5mm",
+            "categoria": "interior",
+            "descripcion": "Placa de yeso para revestimiento interior",
+            "precio": 6.45,
+            "unidad": "m²",
+            "marca": "Knauf",
+            "modelo": "PY-12.5",
+            "dimensiones": "1200x2400x12.5mm",
+            "peso": "8.5 kg/m²"
+        },
+        {
+            "id": "mat_6",
+            "nombre": "Pintura Acrílica Interior",
+            "categoria": "terminacion",
+            "descripcion": "Pintura acrílica de alta calidad para interiores",
+            "precio": 15.80,
+            "unidad": "litro",
+            "marca": "Sherwin Williams",
+            "modelo": "AI-200",
+            "dimensiones": "1 litro",
+            "peso": "1.2 kg"
+        }
+    ]
 
 @app.get("/api/regiones/multiplicadores")
 async def api_multiplicadores_regionales():

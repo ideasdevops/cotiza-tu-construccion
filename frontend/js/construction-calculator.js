@@ -19,8 +19,11 @@ class ConstructionCalculator {
         this.estimateBtn.addEventListener('click', () => this.performQuickEstimate());
         this.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
         
-        // Inicializar tiempo de formulario
-        this.form.querySelector('#formStartTime').value = Date.now();
+        // Inicializar tiempo de formulario (si existe el campo)
+        const formStartTimeField = this.form.querySelector('#formStartTime');
+        if (formStartTimeField) {
+            formStartTimeField.value = Date.now();
+        }
         
         console.log('✅ Calculadora de Construcción inicializada');
     }
@@ -119,7 +122,23 @@ class ConstructionCalculator {
         // Agregar tiempo de envío
         data.formSubmissionTime = Date.now();
         
-        return data;
+        // Mapear nombres de campos del HTML a los esperados por el backend
+        const mappedData = {
+            clientName: data.clientName || '',
+            clientEmail: data.clientEmail || '',
+            clientPhone: data.clientPhone || '',
+            location: data.location || '',
+            constructionType: data.constructionType || '',
+            squareMeters: data.squareMeters || '',
+            floors: data.floors || '1',
+            usageType: data.usageType || '',
+            finishLevel: data.finishLevel || '',
+            formStartTime: data.formStartTime || Date.now(),
+            formSubmissionTime: data.formSubmissionTime || Date.now()
+        };
+        
+        console.log('📋 Datos del formulario:', mappedData);
+        return mappedData;
     }
 
     validateMinimalData(data) {

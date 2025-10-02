@@ -13,15 +13,27 @@ class MaterialsManager {
 
     async loadMaterials() {
         try {
+            console.log("📦 Cargando materiales...");
             this.showLoading();
+            
             const response = await fetch("/api/materiales/precios");
-            if (!response.ok) throw new Error(`Error ${response.status}`);
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+            
             const data = await response.json();
+            console.log("📦 Materiales cargados:", data);
+            
             this.materials = this.processMaterials(data);
             this.renderMaterials();
+            
+            console.log(`✅ ${this.materials.length} materiales cargados exitosamente`);
+            
         } catch (error) {
             console.error("❌ Error cargando materiales:", error);
-            this.showError("Error al cargar los materiales.");
+            this.showError("Error al cargar los materiales. Mostrando materiales por defecto.");
+            
+            // Cargar materiales por defecto en caso de error
+            this.materials = this.getDefaultMaterials();
+            this.renderMaterials();
         }
     }
 
