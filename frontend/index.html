@@ -393,6 +393,33 @@
             </form>
           </div>
 
+          <!-- Sección de Materiales y Precios -->
+          <div class="materials-section">
+            <div class="section-header">
+              <h2><i class="fas fa-tools"></i> Materiales y Precios</h2>
+              <p>Precios actualizados de materiales de construcción en Dólares Americanos</p>
+            </div>
+            
+            <div class="materials-filters">
+              <button class="filter-btn active" data-category="all">Todos</button>
+              <button class="filter-btn" data-category="estructura">Estructura</button>
+              <button class="filter-btn" data-category="cubierta">Cubierta</button>
+              <button class="filter-btn" data-category="aislamiento">Aislamiento</button>
+              <button class="filter-btn" data-category="interior">Interior</button>
+              <button class="filter-btn" data-category="terminacion">Terminación</button>
+            </div>
+            
+            <div class="materials-grid" id="materialsGrid">
+              <!-- Los materiales se cargarán dinámicamente -->
+            </div>
+            
+            <div class="materials-actions">
+              <button class="btn btn-whatsapp" onclick="openWhatsAppForMaterials()">
+                <i class="fab fa-whatsapp"></i> Solicitar Cotización de Materiales
+              </button>
+            </div>
+          </div>
+
           <!-- Panel de Resultados -->
           <div class="quote-results" id="quoteResults" style="display: none;">
             <div class="results-header">
@@ -817,6 +844,7 @@
 
   <!-- Scripts -->
   <script src="/js/construction-calculator.js"></script>
+  <script src="/js/materials-manager.js"></script>
   <script src="/js/contact-form.js"></script>
 </body>
 </html>
