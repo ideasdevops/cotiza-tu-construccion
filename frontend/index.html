@@ -850,5 +850,38 @@
   <script src="/js/construction-calculator.js"></script>
   <script src="/js/materials-manager.js"></script>
   <script src="/js/contact-form.js"></script>
+  
+  <!-- Inicialización -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 Inicializando aplicación de construcción...');
+      
+      // Inicializar calculadora de construcción
+      try {
+        new ConstructionCalculator();
+        console.log('✅ ConstructionCalculator inicializada');
+      } catch (error) {
+        console.error('❌ Error inicializando ConstructionCalculator:', error);
+      }
+      
+      // Inicializar gestor de materiales
+      try {
+        new MaterialsManager();
+        console.log('✅ MaterialsManager inicializado');
+      } catch (error) {
+        console.error('❌ Error inicializando MaterialsManager:', error);
+      }
+      
+      // Inicializar formulario de contacto
+      try {
+        initContactForm();
+        console.log('✅ ContactForm inicializado');
+      } catch (error) {
+        console.error('❌ Error inicializando ContactForm:', error);
+      }
+      
+      console.log('🎉 Aplicación de construcción inicializada completamente');
+    });
+  </script>
 </body>
 </html>

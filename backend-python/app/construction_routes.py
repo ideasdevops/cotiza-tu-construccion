@@ -17,9 +17,17 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Instancias de servicios
-construction_calculator = ConstructionCalculator()
-email_service = ImprovedEmailService()
-nocodb_service = NocoDBService()
+try:
+    logger.info("🏗️ Inicializando servicios de construcción...")
+    construction_calculator = ConstructionCalculator()
+    email_service = ImprovedEmailService()
+    nocodb_service = NocoDBService()
+    logger.info("✅ Servicios de construcción inicializados correctamente")
+except Exception as e:
+    logger.error(f"❌ Error inicializando servicios de construcción: {e}")
+    import traceback
+    logger.error(f"❌ Traceback: {traceback.format_exc()}")
+    raise
 
 @router.get("/health")
 async def health_check():

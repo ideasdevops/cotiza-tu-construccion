@@ -777,37 +777,91 @@ async def api_tipos_uso():
 async def api_precios_materiales():
     """Endpoint API para precios de materiales"""
     try:
-        logger.info("📦 Obteniendo precios de materiales...")
+        logger.info("📦 Obteniendo precios de materiales desde API de cámara de construcción...")
         
-        # Intentar obtener materiales del servicio
+        # Intentar obtener materiales de la API de la cámara de construcción
         try:
-            materiales = price_service.get_all_base_prices()
-            materiales_data = [
-                {
-                    "id": f"mat_{i}",
-                    "nombre": mat.nombre,
-                    "categoria": mat.categoria,
-                    "descripcion": f"Material {mat.nombre} para construcción",
-                    "precio": mat.precio_por_m2,
-                    "unidad": mat.unidad,
-                    "marca": "Sumpetrol",
-                    "modelo": f"MOD-{i}",
-                    "dimensiones": "Estándar",
-                    "peso": "Variable"
-                }
-                for i, mat in enumerate(materiales.values())
-            ]
+            materiales_data = await get_materials_from_camara_api()
             
-            logger.info(f"✅ {len(materiales_data)} materiales obtenidos del servicio")
-            return materiales_data
-            
+            if materiales_data and len(materiales_data) > 0:
+                logger.info(f"✅ {len(materiales_data)} materiales obtenidos de la API de cámara")
+                return materiales_data
+            else:
+                logger.warning("⚠️ API de cámara no retornó materiales, usando materiales base")
+                return get_materials_from_base_service()
+                
         except Exception as e:
-            logger.warning(f"⚠️ Error obteniendo materiales del servicio: {e}")
-            # Retornar materiales por defecto
-            return get_default_materials()
+            logger.warning(f"⚠️ Error obteniendo materiales de API de cámara: {e}")
+            # Retornar materiales del servicio base
+            return get_materials_from_base_service()
             
     except Exception as e:
         logger.error(f"❌ Error en endpoint de materiales: {e}")
+        return get_default_materials()
+
+async def get_materials_from_camara_api():
+    """Obtiene materiales de la API de la cámara de construcción"""
+    try:
+        import aiohttp
+        
+        # URL de la API de la cámara de construcción
+        api_url = "https://api.camaraconstruccion.com.ar/materiales"
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url, timeout=10) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    # Procesar datos de la API
+                    materiales = []
+                    for item in data.get('materiales', []):
+                        materiales.append({
+                            "id": f"cam_{item.get('id', '')}",
+                            "nombre": item.get('nombre', 'Material'),
+                            "categoria": item.get('categoria', 'general'),
+                            "descripcion": item.get('descripcion', 'Material de construcción'),
+                            "precio": float(item.get('precio', 0)),
+                            "unidad": item.get('unidad', 'unidad'),
+                            "marca": item.get('marca', 'N/A'),
+                            "modelo": item.get('modelo', 'N/A'),
+                            "dimensiones": item.get('dimensiones', 'N/A'),
+                            "peso": item.get('peso', 'N/A')
+                        })
+                    
+                    return materiales
+                else:
+                    logger.warning(f"⚠️ API de cámara retornó status {response.status}")
+                    return None
+                    
+    except Exception as e:
+        logger.error(f"❌ Error llamando API de cámara: {e}")
+        return None
+
+def get_materials_from_base_service():
+    """Obtiene materiales del servicio base"""
+    try:
+        materiales = price_service.get_all_base_prices()
+        materiales_data = [
+            {
+                "id": f"mat_{i}",
+                "nombre": mat.nombre,
+                "categoria": mat.categoria,
+                "descripcion": f"Material {mat.nombre} para construcción",
+                "precio": mat.precio_por_m2,
+                "unidad": mat.unidad,
+                "marca": "Sumpetrol",
+                "modelo": f"MOD-{i}",
+                "dimensiones": "Estándar",
+                "peso": "Variable"
+            }
+            for i, mat in enumerate(materiales.values())
+        ]
+        
+        logger.info(f"✅ {len(materiales_data)} materiales obtenidos del servicio base")
+        return materiales_data
+        
+    except Exception as e:
+        logger.error(f"❌ Error obteniendo materiales del servicio base: {e}")
         return get_default_materials()
 
 def get_default_materials():

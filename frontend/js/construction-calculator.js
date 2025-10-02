@@ -5,10 +5,24 @@
 
 class ConstructionCalculator {
     constructor() {
+        console.log('🔧 Inicializando ConstructionCalculator...');
+        
         this.form = document.getElementById('constructionForm');
         this.estimateBtn = document.getElementById('estimate-btn');
+        
+        if (!this.form) {
+            console.error('❌ No se encontró el formulario con ID constructionForm');
+            return;
+        }
+        
+        if (!this.estimateBtn) {
+            console.error('❌ No se encontró el botón de estimación con ID estimate-btn');
+            return;
+        }
+        
         this.submitBtn = this.form.querySelector('button[type="submit"]');
         
+        console.log('✅ Elementos del formulario encontrados correctamente');
         this.init();
     }
 
