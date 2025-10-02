@@ -853,6 +853,10 @@ async def shutdown_event():
     except Exception as e:
         logger.error(f"❌ Error en evento de cierre: {e}")
 
+# Incluir rutas de construcción simplificada
+from .construction_routes import router as construction_router
+app.include_router(construction_router, prefix="/api/construction", tags=["construction"])
+
 if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
