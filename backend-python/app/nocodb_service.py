@@ -17,15 +17,23 @@ class NocodbService:
         self.base_url = getattr(settings, 'NC_DB_URL', settings.NOCODB_URL)
         self.token = getattr(settings, 'NC_TOKEN', settings.NOCODB_TOKEN)
         self.base_id = getattr(settings, 'NC_DB_ID', settings.NOCODB_BASE_ID)
-        self.table_id = settings.NOCODB_TABLE_ID
-        self.api_url = f"{self.base_url}/api/v1/db/data/v1/{self.base_id}/{self.table_id}"
+        
+        # Tablas específicas
+        self.contactos_table_id = settings.NOCODB_CONTACTOS_TABLE_ID
+        self.cotizaciones_table_id = settings.NOCODB_COTIZACIONES_TABLE_ID
+        
+        # URLs para cada tabla
+        self.contactos_api_url = f"{self.base_url}/api/v1/db/data/v1/{self.base_id}/{self.contactos_table_id}"
+        self.cotizaciones_api_url = f"{self.base_url}/api/v1/db/data/v1/{self.base_id}/{self.cotizaciones_table_id}"
         
         logger.info(f"🔗 NocoDB configurado:")
         logger.info(f"   URL: {self.base_url}")
         logger.info(f"   Token: {self.token[:10]}...")
         logger.info(f"   Base ID: {self.base_id}")
-        logger.info(f"   Table ID: {self.table_id}")
-        logger.info(f"   API URL: {self.api_url}")
+        logger.info(f"   Contactos Table ID: {self.contactos_table_id}")
+        logger.info(f"   Cotizaciones Table ID: {self.cotizaciones_table_id}")
+        logger.info(f"   Contactos API URL: {self.contactos_api_url}")
+        logger.info(f"   Cotizaciones API URL: {self.cotizaciones_api_url}")
         
         self.headers = {
             "xc-token": self.token,
@@ -34,39 +42,33 @@ class NocodbService:
     
     async def save_customer_data(self, customer_data: Dict[str, Any]) -> bool:
         """
-        Guarda los datos del cliente en Nocodb
+        Guarda los datos del cliente en Nocodb (tabla de contactos)
         """
         try:
             logger.info(f"🔄 Intentando guardar cliente en NocoDB: {customer_data.get('nombre', 'Sin nombre')}")
-            logger.info(f"📊 URL de API: {self.api_url}")
+            logger.info(f"📊 URL de API: {self.contactos_api_url}")
             logger.info(f"🔑 Token: {self.token[:10]}...")
             
-            # Preparar datos para Nocodb
+            # Preparar datos para Nocodb (formato de tabla contactos_csv)
             nocodb_data = {
-                "Fecha": customer_data.get("fecha", ""),
-                "Nombre": customer_data.get("nombre", ""),
-                "Email": customer_data.get("email", ""),
-                "# Whatsapp": customer_data.get("whatsapp", ""),
-                "Tipo_Construccion": customer_data.get("tipo_construccion", ""),
-                "Metros_Cuadrados": customer_data.get("metros_cuadrados", 0),
-                "Provincia": customer_data.get("provincia", ""),
-                "Pisos": customer_data.get("pisos", 1),
-                "Uso": customer_data.get("uso", ""),
-                "Terminaciones": customer_data.get("terminaciones", ""),
-                "Total_Cotizacion": customer_data.get("total_cotizacion", 0),
-                "Materiales_Seleccionados": str(customer_data.get("materiales", [])),
-                "Observaciones": customer_data.get("observaciones", ""),
-                "Estado": "Nuevo"
+                "nombre_cliente": customer_data.get("nombre", ""),
+                "email_cliente": customer_data.get("email", ""),
+                "telefono_cliente": customer_data.get("whatsapp", ""),
+                "mensaje_consulta": customer_data.get("observaciones", ""),
+                "fecha_consulta": customer_data.get("fecha", ""),
+                "estado_consulta": "Nuevo",
+                "origen_consulta": "Web Construcción",
+                "notas_Internas": f"Tipo: {customer_data.get('tipo_construccion', '')}, Área: {customer_data.get('metros_cuadrados', 0)}m²"
             }
             
             logger.info(f"📝 Datos preparados para NocoDB: {nocodb_data}")
             
             async with aiohttp.ClientSession() as session:
-                logger.info(f"🌐 Enviando POST a: {self.api_url}")
+                logger.info(f"🌐 Enviando POST a: {self.contactos_api_url}")
                 logger.info(f"📋 Headers: {self.headers}")
                 
                 async with session.post(
-                    self.api_url,
+                    self.contactos_api_url,
                     json=nocodb_data,
                     headers=self.headers,
                     timeout=aiohttp.ClientTimeout(total=30)
@@ -188,6 +190,62 @@ class NocodbService:
                         
         except Exception as e:
             logger.error(f"Error actualizando estado del cliente: {e}")
+            return False
+
+    async def save_quote_data(self, quote_data: Dict[str, Any]) -> bool:
+        """
+        Guarda los datos de la cotización en Nocodb (tabla de cotizaciones)
+        """
+        try:
+            logger.info(f"🔄 Intentando guardar cotización en NocoDB: {quote_data.get('client_name', 'Sin nombre')}")
+            logger.info(f"📊 URL de API: {self.cotizaciones_api_url}")
+            
+            # Preparar datos para Nocodb (formato de tabla cotizaciones)
+            nocodb_data = {
+                "cliente_nombre": quote_data.get("client_name", ""),
+                "cliente_email": quote_data.get("client_email", ""),
+                "cliente_telefono": quote_data.get("client_phone", ""),
+                "tipo_construccion": quote_data.get("construction_type", ""),
+                "area_m2": quote_data.get("area", ""),
+                "pisos": quote_data.get("floors", 1),
+                "ubicacion": quote_data.get("location", ""),
+                "nivel_terminacion": quote_data.get("finish_level", ""),
+                "total_cotizacion": quote_data.get("total_cost", ""),
+                "tiempo_estimado": quote_data.get("estimated_time", ""),
+                "fecha_cotizacion": quote_data.get("quote_date", ""),
+                "valido_hasta": quote_data.get("valid_until", ""),
+                "estado": "Nueva",
+                "origen": "Web Construcción",
+                "desglose_costos": str(quote_data.get("breakdown", [])),
+                "observaciones": f"Tipo de uso: {quote_data.get('usage_type', '')}"
+            }
+            
+            logger.info(f"📝 Datos de cotización preparados para NocoDB: {nocodb_data}")
+            
+            async with aiohttp.ClientSession() as session:
+                logger.info(f"🌐 Enviando POST a: {self.cotizaciones_api_url}")
+                
+                async with session.post(
+                    self.cotizaciones_api_url,
+                    json=nocodb_data,
+                    headers=self.headers,
+                    timeout=aiohttp.ClientTimeout(total=30)
+                ) as response:
+                    
+                    response_text = await response.text()
+                    logger.info(f"📡 Respuesta de NocoDB: {response.status} - {response_text}")
+                    
+                    if response.status == 200:
+                        logger.info("✅ Cotización guardada exitosamente en NocoDB")
+                        return True
+                    else:
+                        logger.error(f"❌ Error guardando cotización: {response.status} - {response_text}")
+                        return False
+                        
+        except Exception as e:
+            logger.error(f"❌ Error guardando cotización en NocoDB: {e}")
+            import traceback
+            logger.error(f"❌ Traceback: {traceback.format_exc()}")
             return False
 
 # Instancia global del servicio de Nocodb

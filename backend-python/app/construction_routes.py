@@ -6,7 +6,7 @@ Basado en la lógica exitosa del cotizador solar
 from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
 from typing import Dict, Any
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .construction_calculator import ConstructionCalculator
 from .email_service_improved import ImprovedEmailService
@@ -188,7 +188,7 @@ async def save_quote_to_nocodb(client_data: Dict[str, Any], quote_data: Dict[str
             'status': 'pending'
         }
         
-        success = await nocodb_service.save_construction_quote(nocodb_data)
+        success = await nocodb_service.save_quote_data(nocodb_data)
         
         if success:
             logger.info("✅ Cotización guardada en NocoDB exitosamente")
