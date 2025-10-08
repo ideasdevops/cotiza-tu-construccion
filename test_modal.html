@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modal - Cotizador</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .estimate-grid { display: grid; gap: 10px; margin: 20px 0; }
+        .estimate-item { display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+        .estimate-label { font-weight: bold; }
+        .estimate-value { color: #007bff; }
+        pre { background: #f1f1f1; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test Modal - Cotizador de Construcción</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Estimación Rápida</h2>
+        <button onclick="testQuickEstimate()">Probar Estimación Rápida</button>
+        <div id="quickResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Cotización Detallada</h2>
+        <button onclick="testDetailedQuote()">Probar Cotización Detallada</button>
+        <div id="detailedResult" class="result"></div>
+    </div>
+
+    <script>
+        const testData = {
+            clientName: "Franco",
+            clientEmail: "frsponton@gmail.com",
+            clientPhone: "+5492613151000",
+            location: "la-rioja",
+            constructionType: "industrial",
+            squareMeters: "120",
+            floors: "2",
+            usageType: "residencial",
+            finishLevel: "basico"
+        };
+
+        async function testQuickEstimate() {
+            const resultDiv = document.getElementById('quickResult');
+            resultDiv.innerHTML = '🔄 Probando estimación rápida...';
+            
+            try {
+                console.log('📤 Enviando datos:', testData);
+                const response = await fetch('/api/construction/estimate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                console.log('📡 Respuesta recibida:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `❌ Error ${response.status}: ${errorText}`;
+                    return;
+                }
+                
+                const responseData = await response.json();
+                console.log('📊 Datos recibidos:', responseData);
+                
+                // Simular la lógica del frontend
+                const estimation = responseData.estimation || responseData;
+                console.log('📋 Estimation extraído:', estimation);
+                
+                const area = estimation?.area || 'N/A';
+                const constructionType = estimation?.construction_type || 'N/A';
+                const cost = estimation?.estimated_cost || 'N/A';
+                const time = estimation?.estimated_time || 'N/A';
+                
+                console.log('📊 Datos extraídos:', { area, constructionType, cost, time });
+                
+                resultDiv.innerHTML = `
+                    <h3>✅ Estimación Rápida Exitosa</h3>
+                    <div class="estimate-grid">
+                        <div class="estimate-item">
+                            <span class="estimate-label">Área del Proyecto:</span>
+                            <span class="estimate-value">${area}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="estimate-label">Tipo de Construcción:</span>
+                            <span class="estimate-value">${constructionType}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="estimate-label">Costo Estimado:</span>
+                            <span class="estimate-value">${cost}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="estimate-label">Tiempo Estimado:</span>
+                            <span class="estimate-value">${time}</span>
+                        </div>
+                    </div>
+                    <h4>Datos completos:</h4>
+                    <pre>${JSON.stringify(responseData, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testDetailedQuote() {
+            const resultDiv = document.getElementById('detailedResult');
+            resultDiv.innerHTML = '🔄 Probando cotización detallada...';
+            
+            try {
+                console.log('📤 Enviando datos:', testData);
+                const response = await fetch('/api/construction/quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                console.log('📡 Respuesta recibida:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `❌ Error ${response.status}: ${errorText}`;
+                    return;
+                }
+                
+                const responseData = await response.json();
+                console.log('📊 Datos recibidos:', responseData);
+                
+                // Simular la lógica del frontend
+                const quote = responseData.quote || responseData;
+                console.log('📋 Quote extraído:', quote);
+                
+                const clientName = quote?.client_name || 'N/A';
+                const constructionType = quote?.construction_type || 'N/A';
+                const area = quote?.area || 'N/A';
+                const totalCost = quote?.total_cost || 'N/A';
+                
+                console.log('📊 Datos extraídos:', { clientName, constructionType, area, totalCost });
+                
+                resultDiv.innerHTML = `
+                    <h3>✅ Cotización Detallada Exitosa</h3>
+                    <div class="estimate-grid">
+                        <div class="estimate-item">
+                            <span class="estimate-label">Cliente:</span>
+                            <span class="estimate-value">${clientName}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="estimate-label">Tipo:</span>
+                            <span class="estimate-value">${constructionType}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="estimate-label">Área:</span>
+                            <span class="estimate-value">${area}</span>
+                        </div>
+                        <div class="estimate-item">
+                            <span class="estimate-label">Total:</span>
+                            <span class="estimate-value">${totalCost}</span>
+                        </div>
+                    </div>
+                    <h4>Datos completos:</h4>
+                    <pre>${JSON.stringify(responseData, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
