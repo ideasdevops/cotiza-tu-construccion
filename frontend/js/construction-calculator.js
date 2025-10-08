@@ -278,23 +278,6 @@ class ConstructionCalculator {
             };
         }
         
-        // Botón de enviar por email
-        const emailBtn = document.getElementById('btnSendEmail');
-        if (emailBtn) {
-            emailBtn.onclick = async () => {
-                console.log('📧 Enviando por email...');
-                try {
-                    this.showLoading('Enviando cotización por email...');
-                    await sendConstructionQuoteEmail(quote);
-                    this.hideLoading();
-                    this.showSuccess('Cotización enviada por email exitosamente');
-                } catch (error) {
-                    this.hideLoading();
-                    this.showError('Error enviando email. Intenta nuevamente.');
-                }
-            };
-        }
-        
         // Botón de WhatsApp
         const whatsappBtn = document.getElementById('btnWhatsApp');
         if (whatsappBtn) {
@@ -303,6 +286,10 @@ class ConstructionCalculator {
                 this.requestPersonalizedQuote(quote);
             };
         }
+        
+        // Mostrar mensaje de que el email se envió automáticamente
+        console.log('📧 Email enviado automáticamente al cliente');
+        this.showSuccess('Cotización enviada por email automáticamente');
     }
 
     requestPersonalizedQuote(quote) {
