@@ -1,9 +1,11 @@
-# Dockerfile Ultra-Simple para Cotizador de Construcción
+# Dockerfile con Supervisor para Cotizador de Construcción
 FROM python:3.11-slim
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     gcc \
+    nginx \
+    supervisor \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,8 +19,20 @@ COPY . .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r backend-python/requirements.txt
 
-# Exponer puerto
-EXPOSE 8000
+# Configurar Nginx
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Comando de inicio simple
-CMD ["python", "-m", "uvicorn", "backend-python.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Copiar frontend a ubicación de Nginx
+COPY frontend/ /usr/share/nginx/html/
+
+# Configurar Supervisor
+COPY supervisor.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Crear directorios de logs
+RUN mkdir -p /var/log/supervisor
+
+# Exponer puertos
+EXPOSE 80 8000
+
+# Comando de inicio con Supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
