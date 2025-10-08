@@ -123,7 +123,9 @@ class ConstructionCalculator {
             console.log('📊 Respuesta completa recibida:', responseData);
 
             // Mostrar modal de cotización completa
+            console.log('🎯 Llamando a showDetailedQuoteModal...');
             this.showDetailedQuoteModal(responseData);
+            console.log('✅ showDetailedQuoteModal completado');
 
         } catch (error) {
             console.error('❌ Error en cotización completa:', error);
@@ -250,37 +252,38 @@ class ConstructionCalculator {
         
         console.log('📊 Datos extraídos:', { area, constructionType, cost, time, location, usageType, finishLevel });
         
+        // Verificar que los datos no sean N/A
+        if (area === 'N/A' || constructionType === 'N/A' || cost === 'N/A' || time === 'N/A') {
+            console.error('❌ Datos extraídos son N/A, revisando estructura de datos...');
+            console.log('📋 Estructura completa de estimation:', JSON.stringify(estimation, null, 2));
+        }
+        
+        // Generar contenido dinámico para el modal
         content.innerHTML = `
-            <div class="quick-estimate-summary">
-                <div class="estimate-card">
-                    <h3><i class="fas fa-building"></i> Área</h3>
-                    <div class="value">${area}</div>
-                    <div class="label">Metros Cuadrados</div>
+            <div class="estimate-grid">
+                <div class="estimate-item">
+                    <span class="estimate-label">Área del Proyecto:</span>
+                    <span class="estimate-value">${area}</span>
                 </div>
-                <div class="estimate-card">
-                    <h3><i class="fas fa-home"></i> Tipo</h3>
-                    <div class="value">${constructionType}</div>
-                    <div class="label">Construcción</div>
+                <div class="estimate-item">
+                    <span class="estimate-label">Tipo de Construcción:</span>
+                    <span class="estimate-value">${constructionType}</span>
                 </div>
-                <div class="estimate-card">
-                    <h3><i class="fas fa-dollar-sign"></i> Costo</h3>
-                    <div class="value">${cost}</div>
-                    <div class="label">Estimado</div>
+                <div class="estimate-item">
+                    <span class="estimate-label">Costo Estimado:</span>
+                    <span class="estimate-value">${cost}</span>
                 </div>
-                <div class="estimate-card">
-                    <h3><i class="fas fa-clock"></i> Tiempo</h3>
-                    <div class="value">${time}</div>
-                    <div class="label">Estimado</div>
+                <div class="estimate-item">
+                    <span class="estimate-label">Tiempo Estimado:</span>
+                    <span class="estimate-value">${time}</span>
                 </div>
             </div>
-            <div class="quote-section">
-                <h3><i class="fas fa-info-circle"></i> Información de la Estimación</h3>
-                <p><strong>Área:</strong> ${area}</p>
-                <p><strong>Ubicación:</strong> ${location}</p>
-                <p><strong>Tipo de uso:</strong> ${usageType}</p>
-                <p><strong>Nivel de terminación:</strong> ${finishLevel}</p>
+            <div class="estimate-note">
+                <p><i class="fas fa-info-circle"></i> Esta es una estimación rápida basada en parámetros estándar. Para una cotización detallada con materiales específicos, utiliza "Calcular Cotización Completa".</p>
             </div>
         `;
+        
+        console.log('✅ Contenido dinámico generado para el modal');
 
         // Mostrar modal
         modal.style.display = 'flex';
@@ -318,6 +321,12 @@ class ConstructionCalculator {
         const breakdown = quote?.breakdown || [];
         
         console.log('📊 Datos extraídos:', { clientName, constructionType, area, floors, totalCost, estimatedTime, finishLevel, location, usageType, breakdown });
+        
+        // Verificar que los datos no sean N/A
+        if (clientName === 'N/A' || constructionType === 'N/A' || area === 'N/A' || totalCost === 'N/A') {
+            console.error('❌ Datos extraídos son N/A, revisando estructura de datos...');
+            console.log('📋 Estructura completa de quote:', JSON.stringify(quote, null, 2));
+        }
         
         content.innerHTML = `
             <div class="detailed-quote-summary">
@@ -381,7 +390,9 @@ class ConstructionCalculator {
         this.setupQuoteModalButtons(quote);
 
         // Mostrar modal
+        console.log('🎯 Mostrando modal de cotización detallada...');
         modal.style.display = 'flex';
+        console.log('✅ Modal mostrado, display:', modal.style.display);
     }
 
     populateCostBreakdown(breakdown) {
@@ -427,7 +438,7 @@ class ConstructionCalculator {
         
         // Mostrar mensaje de que el email se envió automáticamente
         console.log('📧 Email enviado automáticamente al cliente');
-        this.showSuccess('Cotización enviada por email automáticamente');
+        // Nota: El email se envía automáticamente desde el backend
     }
 
     requestPersonalizedQuote(quote) {
