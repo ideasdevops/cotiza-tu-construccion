@@ -9,6 +9,8 @@ class ConstructionCalculator {
         
         this.form = document.getElementById('constructionForm');
         this.estimateBtn = document.getElementById('estimate-btn');
+        this.currentEstimation = null;
+        this.currentQuote = null;
         
         if (!this.form) {
             console.error('❌ No se encontró el formulario con ID constructionForm');
@@ -72,11 +74,11 @@ class ConstructionCalculator {
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
-            const estimation = await response.json();
-            console.log('📊 Estimación recibida:', estimation);
+            const responseData = await response.json();
+            console.log('📊 Respuesta recibida:', responseData);
 
             // Mostrar modal de estimación rápida
-            this.showQuickEstimateModal(estimation);
+            this.showQuickEstimateModal(responseData);
 
         } catch (error) {
             console.error('❌ Error en estimación rápida:', error);
@@ -117,15 +119,11 @@ class ConstructionCalculator {
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
-            const response_data = await response.json();
-            console.log('📊 Respuesta completa recibida:', response_data);
-            
-            // Extraer la cotización del objeto anidado
-            const quote = response_data.quote || response_data;
-            console.log('📊 Cotización extraída:', quote);
+            const responseData = await response.json();
+            console.log('📊 Respuesta completa recibida:', responseData);
 
             // Mostrar modal de cotización completa
-            this.showDetailedQuoteModal(quote);
+            this.showDetailedQuoteModal(responseData);
 
         } catch (error) {
             console.error('❌ Error en cotización completa:', error);
@@ -238,6 +236,9 @@ class ConstructionCalculator {
         const estimation = response_data.estimation || response_data;
         console.log('📋 Estimation extraído:', estimation);
         
+        // Guardar estimation actual para PDF
+        this.currentEstimation = estimation;
+        
         // Validar y extraer datos de manera segura
         const area = estimation?.area || 'N/A';
         const constructionType = estimation?.construction_type || 'N/A';
@@ -300,6 +301,9 @@ class ConstructionCalculator {
         // Extraer quote de la respuesta
         const quote = response_data.quote || response_data;
         console.log('📋 Quote extraído:', quote);
+        
+        // Guardar quote actual para PDF
+        this.currentQuote = quote;
         
         // Validar y extraer datos de manera segura
         const clientName = quote?.client_name || 'N/A';
