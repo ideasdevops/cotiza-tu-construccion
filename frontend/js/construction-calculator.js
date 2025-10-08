@@ -216,15 +216,16 @@ class ConstructionCalculator {
 
     showDetailedQuoteModal(quote) {
         console.log('📊 Mostrando modal de cotización completa...');
+        console.log('📊 Datos recibidos:', quote);
         
-        // Llenar datos del modal
-        document.getElementById('quoteClientName').textContent = quote.clientName || 'N/A';
-        document.getElementById('quoteConstructionType').textContent = quote.constructionType || 'N/A';
+        // Llenar datos del modal (usar nombres correctos del backend)
+        document.getElementById('quoteClientName').textContent = quote.client_name || 'N/A';
+        document.getElementById('quoteConstructionType').textContent = quote.construction_type || 'N/A';
         document.getElementById('quoteArea').textContent = `${quote.area || 'N/A'} m²`;
         document.getElementById('quoteFloors').textContent = quote.floors || 'N/A';
-        document.getElementById('quoteTotal').textContent = quote.totalCost || 'N/A';
-        document.getElementById('quoteTime').textContent = quote.estimatedTime || 'N/A';
-        document.getElementById('quoteFinishLevel').textContent = quote.finishLevel || 'N/A';
+        document.getElementById('quoteTotal').textContent = quote.total_cost || 'N/A';
+        document.getElementById('quoteTime').textContent = quote.estimated_time || 'N/A';
+        document.getElementById('quoteFinishLevel').textContent = quote.finish_level || 'N/A';
         document.getElementById('quoteLocation').textContent = quote.location || 'N/A';
 
         // Llenar desglose de costos
