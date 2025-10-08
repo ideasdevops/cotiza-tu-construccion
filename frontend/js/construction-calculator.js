@@ -57,6 +57,7 @@ class ConstructionCalculator {
             this.showLoading('Calculando estimación rápida...');
 
             // Llamar al endpoint de estimación rápida
+            console.log('📤 Enviando datos al backend:', formData);
             const response = await fetch('/api/construction/estimate', {
                 method: 'POST',
                 headers: {
@@ -66,6 +67,8 @@ class ConstructionCalculator {
             });
 
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Error del servidor:', response.status, errorText);
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
