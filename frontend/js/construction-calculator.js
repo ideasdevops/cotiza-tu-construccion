@@ -222,41 +222,162 @@ class ConstructionCalculator {
         return true;
     }
 
-    showQuickEstimateModal(estimation) {
+    showQuickEstimateModal(response_data) {
         console.log('📊 Mostrando modal de estimación rápida...');
+        console.log('📊 Datos recibidos:', response_data);
         
-        // Llenar datos del modal
-        document.getElementById('quickArea').textContent = `${estimation.area || 'N/A'} m²`;
-        document.getElementById('quickType').textContent = estimation.constructionType || 'N/A';
-        document.getElementById('quickCost').textContent = estimation.estimatedCost || 'N/A';
-        document.getElementById('quickTime').textContent = estimation.estimatedTime || 'N/A';
+        const modal = document.getElementById('quickEstimateModal');
+        const content = document.getElementById('quickEstimateContent');
+        
+        if (!modal || !content) {
+            console.error('❌ Modal o contenido no encontrado');
+            return;
+        }
+        
+        // Extraer estimation de la respuesta
+        const estimation = response_data.estimation || response_data;
+        console.log('📋 Estimation extraído:', estimation);
+        
+        // Validar y extraer datos de manera segura
+        const area = estimation?.area || 'N/A';
+        const constructionType = estimation?.construction_type || 'N/A';
+        const cost = estimation?.estimated_cost || 'N/A';
+        const time = estimation?.estimated_time || 'N/A';
+        const location = estimation?.location || 'N/A';
+        const usageType = estimation?.usage_type || 'N/A';
+        const finishLevel = estimation?.finish_level || 'N/A';
+        
+        console.log('📊 Datos extraídos:', { area, constructionType, cost, time, location, usageType, finishLevel });
+        
+        content.innerHTML = `
+            <div class="quick-estimate-summary">
+                <div class="estimate-card">
+                    <h3><i class="fas fa-building"></i> Área</h3>
+                    <div class="value">${area}</div>
+                    <div class="label">Metros Cuadrados</div>
+                </div>
+                <div class="estimate-card">
+                    <h3><i class="fas fa-home"></i> Tipo</h3>
+                    <div class="value">${constructionType}</div>
+                    <div class="label">Construcción</div>
+                </div>
+                <div class="estimate-card">
+                    <h3><i class="fas fa-dollar-sign"></i> Costo</h3>
+                    <div class="value">${cost}</div>
+                    <div class="label">Estimado</div>
+                </div>
+                <div class="estimate-card">
+                    <h3><i class="fas fa-clock"></i> Tiempo</h3>
+                    <div class="value">${time}</div>
+                    <div class="label">Estimado</div>
+                </div>
+            </div>
+            <div class="quote-section">
+                <h3><i class="fas fa-info-circle"></i> Información de la Estimación</h3>
+                <p><strong>Área:</strong> ${area}</p>
+                <p><strong>Ubicación:</strong> ${location}</p>
+                <p><strong>Tipo de uso:</strong> ${usageType}</p>
+                <p><strong>Nivel de terminación:</strong> ${finishLevel}</p>
+            </div>
+        `;
 
         // Mostrar modal
-        document.getElementById('quickEstimateModal').style.display = 'flex';
+        modal.style.display = 'flex';
     }
 
-    showDetailedQuoteModal(quote) {
+    showDetailedQuoteModal(response_data) {
         console.log('📊 Mostrando modal de cotización completa...');
-        console.log('📊 Datos recibidos:', quote);
+        console.log('📊 Datos recibidos:', response_data);
         
-        // Llenar datos del modal (usar nombres correctos del backend)
-        document.getElementById('quoteClientName').textContent = quote.client_name || 'N/A';
-        document.getElementById('quoteConstructionType').textContent = quote.construction_type || 'N/A';
-        document.getElementById('quoteArea').textContent = `${quote.area || 'N/A'} m²`;
-        document.getElementById('quoteFloors').textContent = quote.floors || 'N/A';
-        document.getElementById('quoteTotal').textContent = quote.total_cost || 'N/A';
-        document.getElementById('quoteTime').textContent = quote.estimated_time || 'N/A';
-        document.getElementById('quoteFinishLevel').textContent = quote.finish_level || 'N/A';
-        document.getElementById('quoteLocation').textContent = quote.location || 'N/A';
+        const modal = document.getElementById('detailedQuoteModal');
+        const content = document.getElementById('detailedQuoteContent');
+        
+        if (!modal || !content) {
+            console.error('❌ Modal o contenido no encontrado');
+            return;
+        }
+        
+        // Extraer quote de la respuesta
+        const quote = response_data.quote || response_data;
+        console.log('📋 Quote extraído:', quote);
+        
+        // Validar y extraer datos de manera segura
+        const clientName = quote?.client_name || 'N/A';
+        const constructionType = quote?.construction_type || 'N/A';
+        const area = quote?.area || 'N/A';
+        const floors = quote?.floors || 'N/A';
+        const totalCost = quote?.total_cost || 'N/A';
+        const estimatedTime = quote?.estimated_time || 'N/A';
+        const finishLevel = quote?.finish_level || 'N/A';
+        const location = quote?.location || 'N/A';
+        const usageType = quote?.usage_type || 'N/A';
+        const breakdown = quote?.breakdown || [];
+        
+        console.log('📊 Datos extraídos:', { clientName, constructionType, area, floors, totalCost, estimatedTime, finishLevel, location, usageType, breakdown });
+        
+        content.innerHTML = `
+            <div class="detailed-quote-summary">
+                <div class="quote-section">
+                    <h3><i class="fas fa-building"></i> Información del Proyecto</h3>
+                    <div class="quote-grid">
+                        <div class="quote-item">
+                            <span class="label">Cliente:</span>
+                            <span class="value">${clientName}</span>
+                        </div>
+                        <div class="quote-item">
+                            <span class="label">Tipo de Construcción:</span>
+                            <span class="value">${constructionType}</span>
+                        </div>
+                        <div class="quote-item">
+                            <span class="label">Área:</span>
+                            <span class="value">${area}</span>
+                        </div>
+                        <div class="quote-item">
+                            <span class="label">Pisos:</span>
+                            <span class="value">${floors}</span>
+                        </div>
+                        <div class="quote-item">
+                            <span class="label">Ubicación:</span>
+                            <span class="value">${location}</span>
+                        </div>
+                        <div class="quote-item">
+                            <span class="label">Tipo de Uso:</span>
+                            <span class="value">${usageType}</span>
+                        </div>
+                        <div class="quote-item">
+                            <span class="label">Nivel de Terminación:</span>
+                            <span class="value">${finishLevel}</span>
+                        </div>
+                        <div class="quote-item">
+                            <span class="label">Tiempo Estimado:</span>
+                            <span class="value">${estimatedTime}</span>
+                        </div>
+                    </div>
+                </div>
 
-        // Llenar desglose de costos
-        this.populateCostBreakdown(quote.breakdown || []);
+                <div class="quote-section">
+                    <h3><i class="fas fa-calculator"></i> Desglose de Costos</h3>
+                    <div class="breakdown-list">
+                        ${breakdown.map(item => `
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">${item.category || 'Categoría'}:</span>
+                                <span class="breakdown-value">${item.cost || 'N/A'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="quote-total">
+                        <span class="total-label">Total Estimado:</span>
+                        <span class="total-value">${totalCost}</span>
+                    </div>
+                </div>
+            </div>
+        `;
 
         // Configurar botones de email y PDF
         this.setupQuoteModalButtons(quote);
 
         // Mostrar modal
-        document.getElementById('detailedQuoteModal').style.display = 'flex';
+        modal.style.display = 'flex';
     }
 
     populateCostBreakdown(breakdown) {
@@ -900,4 +1021,208 @@ function generateConstructionEmailHTML(emailData) {
     </body>
     </html>
     `;
+}
+
+// Funciones globales para modales
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function downloadQuickEstimatePDF() {
+    if (window.constructionCalculator && window.constructionCalculator.currentEstimation) {
+        // Generar PDF de estimación rápida usando jsPDF
+        const estimation = window.constructionCalculator.currentEstimation;
+        
+        // Crear contenido HTML para el PDF
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h1 style="color: #f97316; text-align: center;">SUMPETROL</h1>
+                <h2 style="text-align: center;">Estimación Rápida de Construcción</h2>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Información del Proyecto:</h3>
+                    <p><strong>Área:</strong> ${estimation.area || 'N/A'}</p>
+                    <p><strong>Tipo de Construcción:</strong> ${estimation.construction_type || 'N/A'}</p>
+                    <p><strong>Ubicación:</strong> ${estimation.location || 'N/A'}</p>
+                    <p><strong>Tipo de Uso:</strong> ${estimation.usage_type || 'N/A'}</p>
+                    <p><strong>Nivel de Terminación:</strong> ${estimation.finish_level || 'N/A'}</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Estimación de Costos:</h3>
+                    <p><strong>Costo Estimado:</strong> ${estimation.estimated_cost || 'N/A'}</p>
+                    <p><strong>Tiempo Estimado:</strong> ${estimation.estimated_time || 'N/A'}</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Información Adicional:</h3>
+                    <p><strong>Precio Base por m²:</strong> ${estimation.base_price_per_m2 || 'N/A'}</p>
+                    <p><strong>Multiplicador de Ubicación:</strong> ${estimation.location_multiplier || 'N/A'}</p>
+                    <p><strong>Multiplicador de Pisos:</strong> ${estimation.floor_multiplier || 'N/A'}</p>
+                </div>
+                
+                <div style="margin: 20px 0; text-align: center;">
+                    <p><strong>Esta es una estimación rápida basada en parámetros estándar.</strong></p>
+                    <p>Para una cotización detallada con materiales específicos, contacta con nuestro equipo.</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h4>📞 ¿Tienes preguntas?</h4>
+                    <p><strong>Teléfono:</strong> +54 9 261 7110120</p>
+                    <p><strong>Email:</strong> ventas@sumpetrol.com.ar</p>
+                    <p><strong>WhatsApp:</strong> Disponible 24/7</p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <p><strong>Sumpetrol Argentina</strong></p>
+                    <p>Acceso Sur - Lateral Este 4585, Luján de Cuyo, Mendoza</p>
+                    <p>Vicente Lazaretti 903 - Cipolletti, Río Negro</p>
+                </div>
+            </div>
+        `;
+        
+        // Crear ventana de impresión
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Estimación de Construcción - Sumpetrol</title>
+                    <style>
+                        @media print {
+                            body { margin: 0; }
+                            @page { margin: 1cm; }
+                        }
+                    </style>
+                </head>
+                <body>${htmlContent}</body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+        
+        console.log('✅ PDF de estimación rápida generado exitosamente');
+    }
+}
+
+function downloadDetailedQuotePDF() {
+    if (window.constructionCalculator && window.constructionCalculator.currentQuote) {
+        // Generar PDF de cotización detallada usando jsPDF
+        const quote = window.constructionCalculator.currentQuote;
+        
+        // Crear contenido HTML para el PDF
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h1 style="color: #f97316; text-align: center;">SUMPETROL</h1>
+                <h2 style="text-align: center;">Cotización Detallada de Construcción</h2>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Información del Cliente:</h3>
+                    <p><strong>Cliente:</strong> ${quote.client_name || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${quote.client_email || 'N/A'}</p>
+                    <p><strong>Teléfono:</strong> ${quote.client_phone || 'N/A'}</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Información del Proyecto:</h3>
+                    <p><strong>Área:</strong> ${quote.area || 'N/A'}</p>
+                    <p><strong>Tipo de Construcción:</strong> ${quote.construction_type || 'N/A'}</p>
+                    <p><strong>Pisos:</strong> ${quote.floors || 'N/A'}</p>
+                    <p><strong>Ubicación:</strong> ${quote.location || 'N/A'}</p>
+                    <p><strong>Tipo de Uso:</strong> ${quote.usage_type || 'N/A'}</p>
+                    <p><strong>Nivel de Terminación:</strong> ${quote.finish_level || 'N/A'}</p>
+                    <p><strong>Tiempo Estimado:</strong> ${quote.estimated_time || 'N/A'}</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Desglose de Costos:</h3>
+                    ${quote.breakdown ? quote.breakdown.map(item => `
+                        <p><strong>${item.category || 'Categoría'}:</strong> ${item.cost || 'N/A'}</p>
+                    `).join('') : '<p>No hay desglose disponible</p>'}
+                    <p style="font-size: 18px; font-weight: bold; margin-top: 15px;">
+                        <strong>Total Estimado: ${quote.total_cost || 'N/A'}</strong>
+                    </p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3>Información Adicional:</h3>
+                    <p><strong>Costo Base:</strong> ${quote.base_cost || 'N/A'}</p>
+                    <p><strong>Costos Adicionales:</strong> ${quote.additional_costs || 'N/A'}</p>
+                    <p><strong>Fecha de Cotización:</strong> ${quote.quote_date || 'N/A'}</p>
+                    <p><strong>Válida hasta:</strong> ${quote.valid_until || 'N/A'}</p>
+                </div>
+                
+                <div style="margin: 20px 0; text-align: center;">
+                    <p><strong>Esta cotización es válida por 30 días a partir de la fecha de emisión.</strong></p>
+                    <p>Para proceder con el proyecto, contacta con nuestro equipo de ventas.</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h4>📞 ¿Tienes preguntas?</h4>
+                    <p><strong>Teléfono:</strong> +54 9 261 7110120</p>
+                    <p><strong>Email:</strong> ventas@sumpetrol.com.ar</p>
+                    <p><strong>WhatsApp:</strong> Disponible 24/7</p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <p><strong>Sumpetrol Argentina</strong></p>
+                    <p>Acceso Sur - Lateral Este 4585, Luján de Cuyo, Mendoza</p>
+                    <p>Vicente Lazaretti 903 - Cipolletti, Río Negro</p>
+                </div>
+            </div>
+        `;
+        
+        // Crear ventana de impresión
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Cotización de Construcción - Sumpetrol</title>
+                    <style>
+                        @media print {
+                            body { margin: 0; }
+                            @page { margin: 1cm; }
+                        }
+                    </style>
+                </head>
+                <body>${htmlContent}</body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+        
+        console.log('✅ PDF de cotización detallada generado exitosamente');
+    }
+}
+
+function requestDetailedQuote() {
+    if (window.constructionCalculator) {
+        window.constructionCalculator.requestDetailedQuote();
+    }
+}
+
+function requestPersonalizedQuote() {
+    if (window.constructionCalculator && window.constructionCalculator.currentQuote) {
+        const quote = window.constructionCalculator.currentQuote;
+        const message = `Hola! Me interesa solicitar una cotización personalizada para mi proyecto de construcción. Aquí están los detalles:
+
+📋 Información del Proyecto:
+• Área: ${quote.area || 'N/A'}
+• Tipo: ${quote.construction_type || 'N/A'}
+• Pisos: ${quote.floors || 'N/A'}
+• Ubicación: ${quote.location || 'N/A'}
+• Tipo de Uso: ${quote.usage_type || 'N/A'}
+• Nivel de Terminación: ${quote.finish_level || 'N/A'}
+
+💰 Costo Estimado: ${quote.total_cost || 'N/A'}
+
+Por favor, contactame para coordinar una reunión y discutir los detalles específicos del proyecto.
+
+¡Gracias!`;
+
+        const whatsappUrl = `https://wa.me/5492617110120?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    }
 }

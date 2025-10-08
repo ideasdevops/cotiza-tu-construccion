@@ -627,38 +627,20 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="estimate-grid">
-          <div class="estimate-item">
-            <span class="estimate-label">Área del Proyecto:</span>
-            <span class="estimate-value" id="quickArea">-</span>
-          </div>
-          <div class="estimate-item">
-            <span class="estimate-label">Tipo de Construcción:</span>
-            <span class="estimate-value" id="quickType">-</span>
-          </div>
-          <div class="estimate-item">
-            <span class="estimate-label">Costo Estimado:</span>
-            <span class="estimate-value" id="quickCost">-</span>
-          </div>
-          <div class="estimate-item">
-            <span class="estimate-label">Tiempo Estimado:</span>
-            <span class="estimate-value" id="quickTime">-</span>
-          </div>
+        <div id="quickEstimateContent">
+          <!-- Contenido se llena dinámicamente -->
         </div>
-        <div class="estimate-note">
-          <p><i class="fas fa-info-circle"></i> Esta es una estimación rápida basada en parámetros estándar. Para una cotización detallada con materiales específicos, utiliza "Calcular Cotización Completa".</p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal('quickEstimateModal')">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+          <button class="btn btn-primary" onclick="downloadQuickEstimatePDF()">
+            <i class="fas fa-download"></i> Descargar PDF
+          </button>
+          <button class="btn btn-success" onclick="requestDetailedQuote()">
+            <i class="fas fa-calculator"></i> Cotización Completa
+          </button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('quickEstimateModal')">
-          <i class="fas fa-times"></i> Cerrar
-        </button>
-        <button class="btn btn-primary" onclick="downloadQuickEstimatePDF()">
-          <i class="fas fa-download"></i> Descargar PDF
-        </button>
-        <button class="btn btn-whatsapp" onclick="openWhatsAppForQuote()">
-          <i class="fab fa-whatsapp"></i> Solicitar Cotización Personalizada
-        </button>
       </div>
     </div>
   </div>
@@ -673,67 +655,20 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="quote-summary">
-          <h3>Resumen del Proyecto</h3>
-          <div class="summary-grid">
-            <div class="summary-item">
-              <span class="summary-label">Cliente:</span>
-              <span class="summary-value" id="quoteClientName">-</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Tipo:</span>
-              <span class="summary-value" id="quoteConstructionType">-</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Área:</span>
-              <span class="summary-value" id="quoteArea">-</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Pisos:</span>
-              <span class="summary-value" id="quoteFloors">-</span>
-            </div>
-          </div>
+        <div id="detailedQuoteContent">
+          <!-- Contenido se llena dinámicamente -->
         </div>
-        
-        <div class="quote-breakdown">
-          <h3>Desglose de Costos</h3>
-          <div class="breakdown-list" id="quoteBreakdown">
-            <!-- Se llenará dinámicamente -->
-          </div>
-          <div class="quote-total">
-            <span class="total-label">Total Estimado:</span>
-            <span class="total-value" id="quoteTotal">-</span>
-          </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal('detailedQuoteModal')">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+          <button class="btn btn-primary" onclick="downloadDetailedQuotePDF()">
+            <i class="fas fa-download"></i> Descargar PDF Completo
+          </button>
+          <button class="btn btn-success" onclick="requestPersonalizedQuote()">
+            <i class="fab fa-whatsapp"></i> Solicitar Cotización Personalizada
+          </button>
         </div>
-        
-        <div class="quote-details">
-          <h3>Detalles Adicionales</h3>
-          <div class="details-grid">
-            <div class="detail-item">
-              <span class="detail-label">Tiempo de Construcción:</span>
-              <span class="detail-value" id="quoteTime">-</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Nivel de Terminación:</span>
-              <span class="detail-value" id="quoteFinishLevel">-</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Ubicación:</span>
-              <span class="detail-value" id="quoteLocation">-</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('detailedQuoteModal')">
-          <i class="fas fa-times"></i> Cerrar
-        </button>
-        <button class="btn btn-primary" id="btnDownloadPDF">
-          <i class="fas fa-download"></i> Descargar PDF
-        </button>
-        <button class="btn btn-whatsapp" id="btnWhatsApp">
-          <i class="fab fa-whatsapp"></i> Solicitar Cotización Personalizada
-        </button>
       </div>
     </div>
   </div>
