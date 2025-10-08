@@ -231,6 +231,9 @@ class ConstructionCalculator {
         // Llenar desglose de costos
         this.populateCostBreakdown(quote.breakdown || []);
 
+        // Configurar botones de email y PDF
+        this.setupQuoteModalButtons(quote);
+
         // Mostrar modal
         document.getElementById('detailedQuoteModal').style.display = 'flex';
     }
@@ -253,6 +256,74 @@ class ConstructionCalculator {
             `;
             breakdownList.appendChild(itemDiv);
         });
+    }
+
+    setupQuoteModalButtons(quote) {
+        console.log('🔧 Configurando botones del modal de cotización...');
+        
+        // Botón de descargar PDF
+        const downloadBtn = document.getElementById('btnDownloadPDF');
+        if (downloadBtn) {
+            downloadBtn.onclick = () => {
+                console.log('📄 Descargando PDF...');
+                downloadConstructionQuotePDF(quote);
+            };
+        }
+        
+        // Botón de enviar por email
+        const emailBtn = document.getElementById('btnSendEmail');
+        if (emailBtn) {
+            emailBtn.onclick = async () => {
+                console.log('📧 Enviando por email...');
+                try {
+                    this.showLoading('Enviando cotización por email...');
+                    await sendConstructionQuoteEmail(quote);
+                    this.hideLoading();
+                    this.showSuccess('Cotización enviada por email exitosamente');
+                } catch (error) {
+                    this.hideLoading();
+                    this.showError('Error enviando email. Intenta nuevamente.');
+                }
+            };
+        }
+        
+        // Botón de WhatsApp
+        const whatsappBtn = document.getElementById('btnWhatsApp');
+        if (whatsappBtn) {
+            whatsappBtn.onclick = () => {
+                console.log('📱 Redirigiendo a WhatsApp...');
+                this.requestPersonalizedQuote(quote);
+            };
+        }
+    }
+
+    requestPersonalizedQuote(quote) {
+        console.log('📱 Redirigiendo a WhatsApp para cotización personalizada...');
+        
+        const whatsappNumber = '+5492617110120';
+        const message = `Hola! Me interesa una cotización personalizada para mi proyecto de construcción:
+
+📋 *Detalles del Proyecto:*
+• Tipo: ${quote.construction_type || 'N/A'}
+• Área: ${quote.area || 'N/A'}
+• Pisos: ${quote.floors || 'N/A'}
+• Terminación: ${quote.finish_level || 'N/A'}
+• Ubicación: ${quote.location || 'N/A'}
+
+💰 *Cotización Estimada:*
+• Total: ${quote.total_cost || 'N/A'}
+• Tiempo: ${quote.estimated_time || 'N/A'}
+
+👤 *Mis Datos:*
+• Nombre: ${quote.client_name || 'N/A'}
+• Email: ${quote.client_email || 'N/A'}
+• Teléfono: ${quote.client_phone || 'N/A'}
+
+¿Podrían contactarme para coordinar una reunión y discutir los detalles? ¡Gracias!`;
+        
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
     }
 
     showLoading(message) {
@@ -582,3 +653,138 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// ============================================================================
+// FUNCIONES DE EMAIL
+// ============================================================================
+
+/**
+ * Envía email de cotización de construcción
+ */
+async function sendConstructionQuoteEmail(quoteData) {
+    try {
+        console.log('📧 Enviando email de cotización de construcción...');
+        
+        // Preparar datos para el email
+        const emailData = {
+            nombre: quoteData.client_name || 'Cliente',
+            email: quoteData.client_email || '',
+            telefono: quoteData.client_phone || '',
+            whatsapp: quoteData.client_phone || '',
+            provincia: quoteData.location || '',
+            tipo_construccion: quoteData.construction_type || '',
+            metros_cuadrados: quoteData.area ? parseFloat(quoteData.area.replace(' m²', '')) : 0,
+            pisos: quoteData.floors || 1,
+            tipo_uso: quoteData.usage_type || '',
+            nivel_terminacion: quoteData.finish_level || '',
+            total_estimado: quoteData.total_cost || 'N/A',
+            materiales: quoteData.breakdown || [],
+            observaciones: `Proyecto de ${quoteData.construction_type} en ${quoteData.location}`,
+            tiempo_estimado: quoteData.estimated_time || 'N/A'
+        };
+        
+        console.log('📋 Datos del email:', emailData);
+        
+        // Enviar email
+        const response = await fetch('/cotizar/enviar-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(emailData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Email enviado exitosamente:', result);
+        
+        return result;
+        
+    } catch (error) {
+        console.error('❌ Error enviando email:', error);
+        throw error;
+    }
+}
+
+/**
+ * Descarga PDF de cotización
+ */
+function downloadConstructionQuotePDF(quoteData) {
+    try {
+        console.log('📄 Generando PDF de cotización de construcción...');
+        
+        // Crear contenido HTML para el PDF
+        const content = `
+            <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #dc2626; margin-bottom: 10px;">SUMPETROL</h1>
+                    <h2 style="color: #dc2626; margin-bottom: 5px;">Cotización Completa de Construcción</h2>
+                    <p style="color: #666; margin: 0;">Generado el ${new Date().toLocaleDateString('es-AR')}</p>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #dc2626; margin-top: 0;">Resumen del Proyecto</h3>
+                    <p><strong>Cliente:</strong> ${quoteData.client_name || 'N/A'}</p>
+                    <p><strong>Área:</strong> ${quoteData.area || 'N/A'}</p>
+                    <p><strong>Tiempo:</strong> ${quoteData.estimated_time || 'N/A'}</p>
+                    <p><strong>Tipo:</strong> ${quoteData.construction_type || 'N/A'}</p>
+                    <p><strong>Pisos:</strong> ${quoteData.floors || 'N/A'}</p>
+                    <p><strong>Terminación:</strong> ${quoteData.finish_level || 'N/A'}</p>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #dc2626; margin-top: 0;">Desglose de Costos</h3>
+                    ${quoteData.breakdown ? quoteData.breakdown.map(item => 
+                        `<p><strong>${item.category}:</strong> ${item.cost}</p>`
+                    ).join('') : '<p>No hay desglose de costos disponible.</p>'}
+                    <hr style="border: 1px solid #dc2626; margin: 15px 0;">
+                    <p style="font-size: 1.2em; font-weight: bold; color: #dc2626;">
+                        <strong>Total Estimado:</strong> ${quoteData.total_cost || 'N/A'}
+                    </p>
+                </div>
+                
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #856404;">
+                        <strong>Nota:</strong> Esta cotización es válida por 30 días desde la fecha de emisión. 
+                        Los precios están sujetos a cambios sin previo aviso.
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p><strong>SUMPETROL - Construcción y Servicios Industriales</strong></p>
+                    <p>Email: ventas@sumpetrol.com.ar | Teléfono: +54 9 261 7110120</p>
+                    <p>Mendoza: Acceso Sur - Lateral Este 4585, Luján de Cuyo</p>
+                    <p>Río Negro: Vicente Lazaretti 903 - Cipolletti</p>
+                </div>
+            </div>
+        `;
+        
+        // Crear ventana de impresión
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Cotización de Construcción - Sumpetrol</title>
+                    <style>
+                        @media print {
+                            body { margin: 0; }
+                            @page { margin: 1cm; }
+                        }
+                    </style>
+                </head>
+                <body>${content}</body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+        
+        console.log('✅ PDF generado exitosamente');
+        
+    } catch (error) {
+        console.error('❌ Error generando PDF:', error);
+        alert('Error generando PDF. Intenta nuevamente.');
+    }
+}

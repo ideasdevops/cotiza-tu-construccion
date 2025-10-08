@@ -728,10 +728,13 @@
         <button class="btn btn-secondary" onclick="closeModal('detailedQuoteModal')">
           <i class="fas fa-times"></i> Cerrar
         </button>
-        <button class="btn btn-primary" onclick="downloadDetailedQuotePDF()">
+        <button class="btn btn-primary" id="btnDownloadPDF">
           <i class="fas fa-download"></i> Descargar PDF
         </button>
-        <button class="btn btn-whatsapp" onclick="requestPersonalizedQuote()">
+        <button class="btn btn-success" id="btnSendEmail">
+          <i class="fas fa-envelope"></i> Enviar por Email
+        </button>
+        <button class="btn btn-whatsapp" id="btnWhatsApp">
           <i class="fab fa-whatsapp"></i> Solicitar Cotización Personalizada
         </button>
       </div>
