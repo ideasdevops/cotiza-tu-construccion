@@ -111,8 +111,12 @@ class ConstructionCalculator {
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
-            const quote = await response.json();
-            console.log('📊 Cotización recibida:', quote);
+            const response_data = await response.json();
+            console.log('📊 Respuesta completa recibida:', response_data);
+            
+            // Extraer la cotización del objeto anidado
+            const quote = response_data.quote || response_data;
+            console.log('📊 Cotización extraída:', quote);
 
             // Mostrar modal de cotización completa
             this.showDetailedQuoteModal(quote);
@@ -126,11 +130,13 @@ class ConstructionCalculator {
     }
 
     getFormData() {
+        console.log('📋 Obteniendo datos del formulario...');
         const formData = new FormData(this.form);
         const data = {};
         
         for (let [key, value] of formData.entries()) {
             data[key] = value;
+            console.log(`📋 Campo: ${key} = ${value}`);
         }
 
         // Agregar tiempo de envío
@@ -150,6 +156,8 @@ class ConstructionCalculator {
             formStartTime: data.formStartTime || Date.now(),
             formSubmissionTime: data.formSubmissionTime || Date.now()
         };
+        
+        console.log('📋 Datos mapeados:', mappedData);
         
         console.log('📋 Datos del formulario:', mappedData);
         return mappedData;
