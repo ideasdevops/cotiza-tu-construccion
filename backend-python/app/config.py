@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     NOCODB_BASE_ID: str = "pjo0a1kfnvm1ai3"
     NOCODB_TABLE_ID: str = "m7i75nx5rkwockg"
     
+    # Tablas específicas de NocoDB
+    NOCODB_CONTACTOS_TABLE_ID: str = "m4fda5efk6fwth6"
+    NOCODB_COTIZACIONES_TABLE_ID: str = "mo17k9bts54ou45"
+    
     # Variables de entorno del contenedor NocoDB
     NC_DATABASE_URL: Optional[str] = None
     NC_REDIS_URL: Optional[str] = None
