@@ -5,7 +5,7 @@ Basada en la lógica exitosa del cotizador solar
 
 import logging
 from typing import Dict, Any, List
-from datetime import datetime
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -179,7 +179,7 @@ class ConstructionCalculator:
                 'additional_costs': f"U$D {additional_costs:,.0f}",
                 'base_cost': f"U$D {base_cost:,.0f}",
                 'quote_date': datetime.now().strftime('%d/%m/%Y'),
-                'valid_until': (datetime.now().replace(day=datetime.now().day + 30)).strftime('%d/%m/%Y')
+                'valid_until': (datetime.now() + timedelta(days=30)).strftime('%d/%m/%Y')
             }
             
             self.logger.info(f"✅ Cotización detallada calculada: ${total_cost:,.0f}")
