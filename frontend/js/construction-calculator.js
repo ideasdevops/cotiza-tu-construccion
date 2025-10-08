@@ -528,62 +528,7 @@ function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
-function downloadQuickEstimatePDF() {
-    console.log('📄 Generando PDF de estimación rápida...');
-    
-    // Crear contenido HTML para el PDF
-    const content = `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #6B2E3A; margin: 0;">SUMPETROL</h1>
-                <h2 style="color: #6B2E3A; margin: 10px 0;">Estimación Rápida de Construcción</h2>
-                <p style="color: #666; margin: 0;">Generado el ${new Date().toLocaleDateString('es-AR')}</p>
-            </div>
-            
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h3 style="color: #6B2E3A; margin-top: 0;">Resumen del Proyecto</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><strong>Área del Proyecto:</strong> ${document.getElementById('quickArea').textContent}</div>
-                    <div><strong>Tipo de Construcción:</strong> ${document.getElementById('quickType').textContent}</div>
-                    <div><strong>Costo Estimado:</strong> ${document.getElementById('quickCost').textContent}</div>
-                    <div><strong>Tiempo Estimado:</strong> ${document.getElementById('quickTime').textContent}</div>
-                </div>
-            </div>
-            
-            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">
-                <p style="margin: 0;"><strong>Nota:</strong> Esta es una estimación rápida basada en parámetros estándar. Para una cotización detallada con materiales específicos, contacta con nuestro equipo de ventas.</p>
-            </div>
-            
-            <div style="margin-top: 30px; text-align: center; color: #666;">
-                <p><strong>SUMPETROL</strong> - Construcción y Servicios Industriales</p>
-                <p>Email: ventas@sumpetrol.com.ar | Teléfono: +54 9 261 7110120</p>
-                <p>Mendoza: Acceso Sur - Lateral Este 4585, Luján de Cuyo</p>
-                <p>Río Negro: Vicente Lazaretti 903 - Cipolletti</p>
-            </div>
-        </div>
-    `;
-    
-    // Crear ventana para imprimir
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <html>
-            <head>
-                <title>Estimación Rápida - SUMPETROL</title>
-                <style>
-                    body { margin: 0; padding: 20px; }
-                    @media print {
-                        body { margin: 0; }
-                    }
-                </style>
-            </head>
-            <body>
-                ${content}
-            </body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-}
+// Función eliminada - se usa la versión corregida más abajo
 
 function downloadDetailedQuotePDF() {
     console.log('📄 Generando PDF de cotización completa...');
@@ -860,80 +805,44 @@ async function sendConstructionQuoteEmail(quoteData) {
 /**
  * Descarga PDF de cotización
  */
-function downloadConstructionQuotePDF(quoteData) {
+async function downloadConstructionQuotePDF(quoteData) {
     try {
-        console.log('📄 Generando PDF de cotización de construcción...');
+        console.log('📄 Solicitando PDF de cotización desde el backend...');
         
-        // Crear contenido HTML para el PDF
-        const content = `
-            <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #dc2626; margin-bottom: 10px;">SUMPETROL</h1>
-                    <h2 style="color: #dc2626; margin-bottom: 5px;">Cotización Completa de Construcción</h2>
-                    <p style="color: #666; margin: 0;">Generado el ${new Date().toLocaleDateString('es-AR')}</p>
-                </div>
-                
-                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3 style="color: #dc2626; margin-top: 0;">Resumen del Proyecto</h3>
-                    <p><strong>Cliente:</strong> ${quoteData.client_name || 'N/A'}</p>
-                    <p><strong>Área:</strong> ${quoteData.area || 'N/A'}</p>
-                    <p><strong>Tiempo:</strong> ${quoteData.estimated_time || 'N/A'}</p>
-                    <p><strong>Tipo:</strong> ${quoteData.construction_type || 'N/A'}</p>
-                    <p><strong>Pisos:</strong> ${quoteData.floors || 'N/A'}</p>
-                    <p><strong>Terminación:</strong> ${quoteData.finish_level || 'N/A'}</p>
-                </div>
-                
-                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3 style="color: #dc2626; margin-top: 0;">Desglose de Costos</h3>
-                    ${quoteData.breakdown ? quoteData.breakdown.map(item => 
-                        `<p><strong>${item.category}:</strong> ${item.cost}</p>`
-                    ).join('') : '<p>No hay desglose de costos disponible.</p>'}
-                    <hr style="border: 1px solid #dc2626; margin: 15px 0;">
-                    <p style="font-size: 1.2em; font-weight: bold; color: #dc2626;">
-                        <strong>Total Estimado:</strong> ${quoteData.total_cost || 'N/A'}
-                    </p>
-                </div>
-                
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #856404;">
-                        <strong>Nota:</strong> Esta cotización es válida por 30 días desde la fecha de emisión. 
-                        Los precios están sujetos a cambios sin previo aviso.
-                    </p>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-                    <p><strong>SUMPETROL - Construcción y Servicios Industriales</strong></p>
-                    <p>Email: ventas@sumpetrol.com.ar | Teléfono: +54 9 261 7110120</p>
-                    <p>Mendoza: Acceso Sur - Lateral Este 4585, Luján de Cuyo</p>
-                    <p>Río Negro: Vicente Lazaretti 903 - Cipolletti</p>
-                </div>
-            </div>
-        `;
+        // Llamar al endpoint del backend para generar PDF
+        const response = await fetch('/cotizar/descargar-pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                customer_name: quoteData.client_name || 'Cliente',
+                customer_email: quoteData.client_email || '',
+                quote_data: quoteData
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        // Crear blob y descargar
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `cotizacion_${quoteData.client_name || 'cliente'}_${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
         
-        // Crear ventana de impresión
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Cotización de Construcción - Sumpetrol</title>
-                    <style>
-                        @media print {
-                            body { margin: 0; }
-                            @page { margin: 1cm; }
-                        }
-                    </style>
-                </head>
-                <body>${content}</body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-        
-        console.log('✅ PDF generado exitosamente');
+        console.log('✅ PDF de cotización descargado exitosamente');
         
     } catch (error) {
-        console.error('❌ Error generando PDF:', error);
-        alert('Error generando PDF. Intenta nuevamente.');
+        console.error('❌ Error descargando PDF:', error);
+        alert('Error descargando PDF. Intenta nuevamente.');
     }
 }
 
@@ -1046,169 +955,99 @@ function closeModal(modalId) {
     }
 }
 
-function downloadQuickEstimatePDF() {
+async function downloadQuickEstimatePDF() {
     if (window.constructionCalculator && window.constructionCalculator.currentEstimation) {
-        // Generar PDF de estimación rápida usando jsPDF
-        const estimation = window.constructionCalculator.currentEstimation;
-        
-        // Crear contenido HTML para el PDF
-        const htmlContent = `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-                <h1 style="color: #f97316; text-align: center;">SUMPETROL</h1>
-                <h2 style="text-align: center;">Estimación Rápida de Construcción</h2>
-                
-                <div style="margin: 20px 0;">
-                    <h3>Información del Proyecto:</h3>
-                    <p><strong>Área:</strong> ${estimation.area || 'N/A'}</p>
-                    <p><strong>Tipo de Construcción:</strong> ${estimation.construction_type || 'N/A'}</p>
-                    <p><strong>Ubicación:</strong> ${estimation.location || 'N/A'}</p>
-                    <p><strong>Tipo de Uso:</strong> ${estimation.usage_type || 'N/A'}</p>
-                    <p><strong>Nivel de Terminación:</strong> ${estimation.finish_level || 'N/A'}</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h3>Estimación de Costos:</h3>
-                    <p><strong>Costo Estimado:</strong> ${estimation.estimated_cost || 'N/A'}</p>
-                    <p><strong>Tiempo Estimado:</strong> ${estimation.estimated_time || 'N/A'}</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h3>Información Adicional:</h3>
-                    <p><strong>Precio Base por m²:</strong> ${estimation.base_price_per_m2 || 'N/A'}</p>
-                    <p><strong>Multiplicador de Ubicación:</strong> ${estimation.location_multiplier || 'N/A'}</p>
-                    <p><strong>Multiplicador de Pisos:</strong> ${estimation.floor_multiplier || 'N/A'}</p>
-                </div>
-                
-                <div style="margin: 20px 0; text-align: center;">
-                    <p><strong>Esta es una estimación rápida basada en parámetros estándar.</strong></p>
-                    <p>Para una cotización detallada con materiales específicos, contacta con nuestro equipo.</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h4>📞 ¿Tienes preguntas?</h4>
-                    <p><strong>Teléfono:</strong> +54 9 261 7110120</p>
-                    <p><strong>Email:</strong> ventas@sumpetrol.com.ar</p>
-                    <p><strong>WhatsApp:</strong> Disponible 24/7</p>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                    <p><strong>Sumpetrol Argentina</strong></p>
-                    <p>Acceso Sur - Lateral Este 4585, Luján de Cuyo, Mendoza</p>
-                    <p>Vicente Lazaretti 903 - Cipolletti, Río Negro</p>
-                </div>
-            </div>
-        `;
-        
-        // Crear ventana de impresión
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Estimación de Construcción - Sumpetrol</title>
-                    <style>
-                        @media print {
-                            body { margin: 0; }
-                            @page { margin: 1cm; }
-                        }
-                    </style>
-                </head>
-                <body>${htmlContent}</body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-        
-        console.log('✅ PDF de estimación rápida generado exitosamente');
+        try {
+            console.log('📄 Solicitando PDF de estimación rápida desde el backend...');
+            
+            const estimation = window.constructionCalculator.currentEstimation;
+            
+            // Llamar al endpoint del backend para generar PDF
+            const response = await fetch('/cotizar/descargar-pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    customer_name: estimation.client_name || 'Cliente',
+                    customer_email: estimation.client_email || '',
+                    quote_data: estimation
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            // Crear blob y descargar
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `estimacion_rapida_${estimation.client_name || 'cliente'}_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            console.log('✅ PDF de estimación rápida descargado exitosamente');
+            
+        } catch (error) {
+            console.error('❌ Error descargando PDF de estimación rápida:', error);
+            alert('Error descargando PDF. Intenta nuevamente.');
+        }
+    } else {
+        console.error('❌ No hay datos de estimación disponibles');
+        alert('No hay datos de estimación disponibles para generar PDF.');
     }
 }
 
-function downloadDetailedQuotePDF() {
+async function downloadDetailedQuotePDF() {
     if (window.constructionCalculator && window.constructionCalculator.currentQuote) {
-        // Generar PDF de cotización detallada usando jsPDF
-        const quote = window.constructionCalculator.currentQuote;
-        
-        // Crear contenido HTML para el PDF
-        const htmlContent = `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-                <h1 style="color: #f97316; text-align: center;">SUMPETROL</h1>
-                <h2 style="text-align: center;">Cotización Detallada de Construcción</h2>
-                
-                <div style="margin: 20px 0;">
-                    <h3>Información del Cliente:</h3>
-                    <p><strong>Cliente:</strong> ${quote.client_name || 'N/A'}</p>
-                    <p><strong>Email:</strong> ${quote.client_email || 'N/A'}</p>
-                    <p><strong>Teléfono:</strong> ${quote.client_phone || 'N/A'}</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h3>Información del Proyecto:</h3>
-                    <p><strong>Área:</strong> ${quote.area || 'N/A'}</p>
-                    <p><strong>Tipo de Construcción:</strong> ${quote.construction_type || 'N/A'}</p>
-                    <p><strong>Pisos:</strong> ${quote.floors || 'N/A'}</p>
-                    <p><strong>Ubicación:</strong> ${quote.location || 'N/A'}</p>
-                    <p><strong>Tipo de Uso:</strong> ${quote.usage_type || 'N/A'}</p>
-                    <p><strong>Nivel de Terminación:</strong> ${quote.finish_level || 'N/A'}</p>
-                    <p><strong>Tiempo Estimado:</strong> ${quote.estimated_time || 'N/A'}</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h3>Desglose de Costos:</h3>
-                    ${quote.breakdown ? quote.breakdown.map(item => `
-                        <p><strong>${item.category || 'Categoría'}:</strong> ${item.cost || 'N/A'}</p>
-                    `).join('') : '<p>No hay desglose disponible</p>'}
-                    <p style="font-size: 18px; font-weight: bold; margin-top: 15px;">
-                        <strong>Total Estimado: ${quote.total_cost || 'N/A'}</strong>
-                    </p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h3>Información Adicional:</h3>
-                    <p><strong>Costo Base:</strong> ${quote.base_cost || 'N/A'}</p>
-                    <p><strong>Costos Adicionales:</strong> ${quote.additional_costs || 'N/A'}</p>
-                    <p><strong>Fecha de Cotización:</strong> ${quote.quote_date || 'N/A'}</p>
-                    <p><strong>Válida hasta:</strong> ${quote.valid_until || 'N/A'}</p>
-                </div>
-                
-                <div style="margin: 20px 0; text-align: center;">
-                    <p><strong>Esta cotización es válida por 30 días a partir de la fecha de emisión.</strong></p>
-                    <p>Para proceder con el proyecto, contacta con nuestro equipo de ventas.</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h4>📞 ¿Tienes preguntas?</h4>
-                    <p><strong>Teléfono:</strong> +54 9 261 7110120</p>
-                    <p><strong>Email:</strong> ventas@sumpetrol.com.ar</p>
-                    <p><strong>WhatsApp:</strong> Disponible 24/7</p>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                    <p><strong>Sumpetrol Argentina</strong></p>
-                    <p>Acceso Sur - Lateral Este 4585, Luján de Cuyo, Mendoza</p>
-                    <p>Vicente Lazaretti 903 - Cipolletti, Río Negro</p>
-                </div>
-            </div>
-        `;
-        
-        // Crear ventana de impresión
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Cotización de Construcción - Sumpetrol</title>
-                    <style>
-                        @media print {
-                            body { margin: 0; }
-                            @page { margin: 1cm; }
-                        }
-                    </style>
-                </head>
-                <body>${htmlContent}</body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-        
-        console.log('✅ PDF de cotización detallada generado exitosamente');
+        try {
+            console.log('📄 Solicitando PDF de cotización detallada desde el backend...');
+            
+            const quote = window.constructionCalculator.currentQuote;
+            
+            // Llamar al endpoint del backend para generar PDF
+            const response = await fetch('/cotizar/descargar-pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    customer_name: quote.client_name || 'Cliente',
+                    customer_email: quote.client_email || '',
+                    quote_data: quote
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            // Crear blob y descargar
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `cotizacion_detallada_${quote.client_name || 'cliente'}_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            console.log('✅ PDF de cotización detallada descargado exitosamente');
+            
+        } catch (error) {
+            console.error('❌ Error descargando PDF de cotización detallada:', error);
+            alert('Error descargando PDF. Intenta nuevamente.');
+        }
+    } else {
+        console.error('❌ No hay datos de cotización disponibles');
+        alert('No hay datos de cotización disponibles para generar PDF.');
     }
 }
 
