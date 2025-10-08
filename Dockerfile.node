@@ -1,0 +1,30 @@
+# Dockerfile para Node.js Backend - Cotizador de Construcción
+FROM node:18-alpine
+
+# Instalar dependencias del sistema
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++
+
+# Crear directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de Node.js
+COPY backend-node/package*.json ./
+COPY backend-node/tsconfig.json ./
+
+# Instalar dependencias
+RUN npm ci --only=production
+
+# Copiar código fuente
+COPY backend-node/ ./
+
+# Compilar TypeScript
+RUN npm run build
+
+# Exponer puerto
+EXPOSE 3000
+
+# Comando de inicio
+CMD ["npm", "start"]

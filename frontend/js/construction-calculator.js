@@ -680,13 +680,17 @@ async function sendConstructionQuoteEmail(quoteData) {
         
         console.log('📋 Datos del email:', emailData);
         
-        // Enviar email
-        const response = await fetch('/cotizar/enviar-email', {
+        // Enviar email usando servicio de Node.js
+        const response = await fetch('/api/email/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(emailData)
+            body: JSON.stringify({
+                to: emailData.email,
+                subject: `🏗️ Cotización de Construcción - ${emailData.nombre}`,
+                html: generateConstructionEmailHTML(emailData)
+            })
         });
         
         if (!response.ok) {
@@ -782,4 +786,105 @@ function downloadConstructionQuotePDF(quoteData) {
         console.error('❌ Error generando PDF:', error);
         alert('Error generando PDF. Intenta nuevamente.');
     }
+}
+
+/**
+ * Genera HTML para email de cotización de construcción
+ */
+function generateConstructionEmailHTML(emailData) {
+    return `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cotización de Construcción - Sumpetrol</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: white; padding: 30px; border: 1px solid #e5e7eb; }
+            .footer { background: #1f2937; color: white; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; }
+            .quote-summary { background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .quote-item { display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: white; border-radius: 5px; }
+            .quote-label { font-weight: 600; color: #374151; }
+            .quote-value { color: #1f2937; font-weight: 700; }
+            .cta-button { background: #dc2626; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 20px 0; }
+            .contact-info { background: #e5f3ff; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🏗️ Cotización de Construcción Personalizada</h1>
+                <p>Estimado/a ${emailData.nombre}</p>
+            </div>
+            
+            <div class="content">
+                <p>Gracias por confiar en Sumpetrol para tu proyecto de construcción. Hemos preparado una cotización personalizada basada en tus necesidades específicas.</p>
+                
+                <div class="quote-summary">
+                    <h3>📊 Resumen de tu Proyecto</h3>
+                    <div class="quote-item">
+                        <span class="quote-label">Tipo de Construcción:</span>
+                        <span class="quote-value">${emailData.tipo_construccion || 'N/A'}</span>
+                    </div>
+                    <div class="quote-item">
+                        <span class="quote-label">Área Total:</span>
+                        <span class="quote-value">${emailData.metros_cuadrados || 'N/A'} m²</span>
+                    </div>
+                    <div class="quote-item">
+                        <span class="quote-label">Número de Pisos:</span>
+                        <span class="quote-value">${emailData.pisos || 'N/A'}</span>
+                    </div>
+                    <div class="quote-item">
+                        <span class="quote-label">Nivel de Terminación:</span>
+                        <span class="quote-value">${emailData.nivel_terminacion || 'N/A'}</span>
+                    </div>
+                    <div class="quote-item">
+                        <span class="quote-label">Ubicación:</span>
+                        <span class="quote-value">${emailData.provincia || 'N/A'}</span>
+                    </div>
+                    <div class="quote-item">
+                        <span class="quote-label">Tiempo Estimado:</span>
+                        <span class="quote-value">${emailData.tiempo_estimado || 'N/A'}</span>
+                    </div>
+                    <div class="quote-item">
+                        <span class="quote-label">Inversión Total:</span>
+                        <span class="quote-value">${emailData.total_estimado || 'N/A'}</span>
+                    </div>
+                </div>
+                
+                <p>Esta cotización es válida por 30 días y incluye:</p>
+                <ul>
+                    <li>✅ Estructura básica de alta calidad</li>
+                    <li>✅ Materiales certificados</li>
+                    <li>✅ Mano de obra especializada</li>
+                    <li>✅ Instalaciones completas</li>
+                    <li>✅ Garantía extendida</li>
+                    <li>✅ Supervisión profesional</li>
+                </ul>
+                
+                <div class="contact-info">
+                    <h4>📞 ¿Tienes preguntas?</h4>
+                    <p>Nuestro equipo de expertos está listo para ayudarte:</p>
+                    <p><strong>Teléfono:</strong> +54 9 261 7110120</p>
+                    <p><strong>Email:</strong> ventas@sumpetrol.com.ar</p>
+                    <p><strong>WhatsApp:</strong> Disponible 24/7</p>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="https://sumpetrol.com.ar" class="cta-button">Ver más información</a>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p><strong>Sumpetrol Argentina</strong></p>
+                <p>Acceso Sur - Lateral Este 4585, Luján de Cuyo, Mendoza</p>
+                <p>Vicente Lazaretti 903 - Cipolletti, Río Negro</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
 }
