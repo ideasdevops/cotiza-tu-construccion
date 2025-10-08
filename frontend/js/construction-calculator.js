@@ -102,6 +102,7 @@ class ConstructionCalculator {
             this.showLoading('Calculando cotización completa...');
 
             // Llamar al endpoint de cotización completa
+            console.log('📤 Enviando datos de cotización detallada:', formData);
             const response = await fetch('/api/construction/quote', {
                 method: 'POST',
                 headers: {
@@ -111,6 +112,8 @@ class ConstructionCalculator {
             });
 
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Error del servidor en cotización detallada:', response.status, errorText);
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
@@ -167,21 +170,26 @@ class ConstructionCalculator {
     }
 
     validateMinimalData(data) {
+        console.log('🔍 Validando datos mínimos:', data);
         const required = ['clientName', 'clientEmail', 'clientPhone', 'location', 'constructionType', 'squareMeters'];
         
         for (let field of required) {
             if (!data[field] || data[field].trim() === '') {
-                console.warn(`⚠️ Campo requerido faltante: ${field}`);
+                console.warn(`⚠️ Campo requerido faltante: ${field} (valor: ${data[field]})`);
                 return false;
             }
         }
         
+        console.log('✅ Validación mínima exitosa');
         return true;
     }
 
     validateFormData(data) {
+        console.log('🔍 Validando datos del formulario:', data);
+        
         // Validar datos mínimos
         if (!this.validateMinimalData(data)) {
+            console.warn('❌ Validación mínima falló');
             return false;
         }
 
@@ -190,10 +198,12 @@ class ConstructionCalculator {
         
         for (let field of additionalRequired) {
             if (!data[field] || data[field].trim() === '') {
-                console.warn(`⚠️ Campo requerido faltante: ${field}`);
+                console.warn(`⚠️ Campo requerido faltante: ${field} (valor: ${data[field]})`);
                 return false;
             }
         }
+        
+        console.log('✅ Validación de formulario exitosa');
 
         // Validar email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
